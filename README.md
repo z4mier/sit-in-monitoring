@@ -1,1 +1,1 @@
-CCS Sit-in Monitoring System
+Sit-in Monitoring System
