@@ -1,1 +1,1 @@
-Sit-in Monitoring System
+A Sit-In Monitoring System using PHP.
