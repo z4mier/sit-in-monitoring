@@ -15,12 +15,13 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Home</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="styles.css"> <!-- Add your external CSS file here -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body {
             margin: 0;
             font-family: 'Inter', sans-serif;
             display: flex;
+            background-color: #0d121e;
         }
 
         .main-content {
@@ -38,14 +39,14 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background-color: #f4f4f4;
+            color: white;
             padding: 20px;
             border-bottom: 2px solid #ddd;
         }
 
         header h1 {
             margin: 0;
-            color: #0d121e;
+            color: white;
         }
 
         .overview {
@@ -57,7 +58,7 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
         .overview .card {
             flex: 1;
             padding: 20px;
-            background-color: #ffffff;
+            background-color: #212b40;
             border-radius: 10px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             text-align: center;
@@ -65,14 +66,23 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
 
         .overview .card h3 {
             margin-bottom: 10px;
-            color: #0d121e;
+            color: white;
+            font-weight: normal;
+            font-size: 18px;
         }
 
         .overview .card p {
             margin: 0;
-            font-size: 20px;
+            font-size: 25px;
             font-weight: bold;
-            color: #3498db;
+            color: white;
+        }
+
+        .chart-container {
+            margin-top: 40px;
+        }
+        .chart-container h2 {
+            color: white; 
         }
     </style>
 </head>
@@ -84,29 +94,29 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
     <div class="main-content">
         <!-- Header -->
         <header>
-            <h1>Welcome, Admin!</h1>
+            <h1>Dashboard</h1>
         </header>
 
         <!-- Overview Section -->
         <section class="overview">
             <div class="card">
-                <h3>Total Students</h3>
+                <h3>Students Registered</h3>
                 <p>1200</p>
             </div>
             <div class="card">
-                <h3>Active Announcements</h3>
+                <h3>Current Sit-In</h3>
                 <p>8</p>
             </div>
             <div class="card">
-                <h3>Ongoing Sit-Ins</h3>
+                <h3>Total Sit-In</h3>
                 <p>5</p>
             </div>
         </section>
 
-        <!-- Additional Content -->
-        <section class="content">
-            <h2>Dashboard Content</h2>
-            <p>Here you can manage students, view reports, and handle announcements.</p>
+        <!-- Chart Section -->
+        <section class="chart-container">
+            <h2>Statistics</h2>
+            <canvas id="languageChart"></canvas>
         </section>
     </div>
 
@@ -116,6 +126,66 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
                 window.location.href = "../includes/logout.php";
             }
         }
+
+        // Sample data for the chart
+        const languageData = {
+            labels: ['Python', 'JavaScript', 'Java', 'C++', 'PHP', 'Ruby'],
+            datasets: [{
+                label: 'Number of Students',
+                data: [50, 30, 20, 10, 5, 2],
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 206, 86, 0.2)',
+                    'rgba(75, 192, 192, 0.2)',
+                    'rgba(153, 102, 255, 0.2)',
+                    'rgba(255, 159, 64, 0.2)'
+                ],
+                borderColor: [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(255, 159, 64, 1)'
+                ],
+                borderWidth: 1
+            }]
+        };
+
+        // Config for the chart
+        const config = {
+            type: 'bar',
+            data: languageData,
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            color: 'white'
+                        }
+                    },
+                    x: {
+                        ticks: {
+                            color: 'white' 
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: 'white'
+                        }
+                    }
+                }
+            }
+        };
+
+        // Render the chart
+        const languageChart = new Chart(
+            document.getElementById('languageChart'),
+            config
+        );
     </script>
 </body>
 </html>
