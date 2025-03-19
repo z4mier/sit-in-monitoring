@@ -1,11 +1,41 @@
-<?php
-session_start();
+<!--CURRENT SIT-IN -->
 
-// Check if the user is logged in and has admin role
-if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
-    header("Location: index.php"); // Redirect to login page if not an admin
-    exit();
+<?php
+// Include database connection
+include '../includes/db-connection.php';
+
+// Initialize $student_rows
+$student_rows = '';
+
+// Fetch sit-in records from `sit_in_records` table
+$sql = "SELECT id_no AS student_id, 
+               name AS student_name, 
+               purpose, 
+               lab_number, 
+               remaining_sessions, 
+               timestamp
+        FROM sit_in_records
+        ORDER BY timestamp DESC";
+
+$result = $conn->query($sql);
+
+// Check query result and build rows
+if ($result && $result->num_rows > 0) {
+    while ($row = $result->fetch_assoc()) {
+        $student_rows .= "<tr>
+            <td>" . htmlspecialchars($row['student_id']) . "</td>
+            <td>" . htmlspecialchars(isset($row['student_name']) ? $row['student_name'] : "Unknown") . "</td>
+            <td>" . htmlspecialchars($row['purpose']) . "</td>
+            <td>" . htmlspecialchars($row['lab_number']) . "</td>
+            <td>" . htmlspecialchars($row['remaining_sessions']) . "</td>
+        </tr>";
+    }
+} else {
+    $student_rows = "<tr><td colspan='6'>No sit-in records found.</td></tr>";
 }
+
+// Close database connection
+$conn->close();
 ?>
 
 <!DOCTYPE html>
@@ -13,7 +43,7 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Students</title>
+    <title>Admin - Students Sit-In Records</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         body {
@@ -25,14 +55,14 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
         }
 
         .main-content {
-            margin-left: 80px; /* Matches the default sidebar width */
+            margin-left: 80px;
             padding: 20px;
             transition: margin-left 0.3s;
             flex: 1;
         }
 
         .sidebar:hover ~ .main-content {
-            margin-left: 250px; /* Matches expanded sidebar width */
+            margin-left: 250px;
         }
 
         header {
@@ -43,20 +73,10 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
             border-bottom: 2px solid #333;
         }
 
-        header h1 {
-            margin: 0;
-            color: #ffffff;
-        }
-
         .table-container {
             margin-top: 20px;
             border-radius: 10px;
             padding: 20px;   
-        }
-
-        .table-container h2 {
-            margin: 0 0 20px 0;
-            color: #ffffff;
         }
 
         table {
@@ -71,7 +91,6 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
 
         table th {
             background-color: #0d121e;
-            
         }
 
         table tr:nth-child(even) {
@@ -94,7 +113,7 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
         }
 
         .search-container input {
-            padding: 10px 10px 10px 30px; /* Add padding to the left for the icon */
+            padding: 10px 10px 10px 30px; 
             border: none;
             border-radius: 5px;
             width: 200px;
@@ -121,109 +140,6 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
             cursor: pointer;
             margin-left: 10px;
         }
-
-        .pagination {
-            display: flex;
-            justify-content: center;
-            margin-top: 20px;
-        }
-
-        .pagination a {
-            color: #ffffff;
-            padding: 10px 15px;
-            text-decoration: none;
-            border: 1px solid #333;
-            margin: 0 5px;
-            border-radius: 5px;
-        }
-
-        .pagination a.active {
-            background-color: #3498db;
-            border-color: #3498db;
-        }
-
-        .pagination a:hover {
-            background-color: #3a3a4c;
-        }
-
-        /* Modal Styles */
-        .modal {
-            display: none; /* Hidden by default */
-            position: fixed; /* Stay in place */
-            z-index: 1; /* Sit on top */
-            left: 0;
-            top: 0;
-            width: 100%; /* Full width */
-            height: 100%; /* Full height */
-            overflow: auto; /* Enable scroll if needed */
-            background-color: rgb(0,0,0); /* Fallback color */
-            background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
-            padding-top: 60px;
-        }
-
-        .modal-content {
-            background-color: #fefefe;
-            margin: 5% auto; /* 15% from the top and centered */
-            padding: 20px;
-            border: 1px solid #888;
-            width: 80%; /* Could be more or less, depending on screen size */
-            max-width: 500px;
-            border-radius: 10px;
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid #ddd;
-            padding-bottom: 10px;
-        }
-
-        .modal-header h2 {
-            margin: 0;
-        }
-
-        .modal-body {
-            margin-top: 20px;
-        }
-
-        .modal-footer {
-            display: flex;
-            justify-content: flex-end;
-            margin-top: 20px;
-        }
-
-        .modal-footer button {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        .close {
-            color: #aaa;
-            font-size: 28px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        .close:hover,
-        .close:focus {
-            color: black;
-            text-decoration: none;
-            cursor: pointer;
-        }
-
-        .btn-close {
-            background-color: #ccc;
-            color: #000;
-        }
-
-        .btn-sit-in {
-            background-color: #3498db;
-            color: #fff;
-            margin-left: 10px;
-        }
     </style>
 </head>
 <body>
@@ -232,12 +148,11 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
 
     <!-- Main Content -->
     <div class="main-content">
-        <!-- Header -->
         <header>
-            <h1>Students</h1>
-            <div class="search-container">
+            <h1>Students Sit-In Records</h1>
+            <div class="search-container">  
                 <i class="fas fa-search search-icon"></i>
-                <input type="text" placeholder="Search contacts">
+                <input type="text" id="searchInput" placeholder="Search">
                 <button class="add-button" id="openModalBtn"><i class="fas fa-plus"></i></button>
             </div>
         </header>
@@ -247,57 +162,53 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
             <table>
                 <thead>
                     <tr>
+                        <th>ID NUMBER</th>
                         <th>NAME</th>
-                        <th>EMAIL</th>
-                        <th>LOCATION</th>
-                        <th>PHONE</th>
+                        <th>PURPOSE</th>
+                        <th>LAB #</th>
+                        <th>REMAINING SESSIONS</th>
                     </tr>
                 </thead>
-                <tbody>
-                    <tr>
-                        <td><img src="../assets/profile1.jpg" alt="Profile Image" class="profile-image"> Felicia Burke</td>
-                        <td>example@mail.com</td>
-                        <td>Hong Kong, China</td>
-                        <td>+1 (070) 123-4567</td>
-                    </tr>
-                    <tr>
-                        <td><img src="../assets/profile2.jpg" alt="Profile Image" class="profile-image"> Pamela Garza</td>
-                        <td>example@mail.com</td>
-                        <td>Boston, USA</td>
-                        <td>+1 (070) 123-4567</td>
-                    </tr>
-                    <tr>
-                        <td><img src="../assets/profile3.jpg" alt="Profile Image" class="profile-image"> Sophia Hale</td>
-                        <td>example@mail.com</td>
-                        <td>New York, USA</td>
-                        <td>+1 (070) 123-4567</td>
-                    </tr>
-                    <!-- Add more rows as needed -->
+                <tbody id="studentTable">
+                    <?php echo $student_rows; ?>
                 </tbody>
             </table>
-
-            <!-- Pagination -->
-            <div class="pagination">
-                <a href="#">&laquo;</a>
-                <a href="#" class="active">1</a>
-                <a href="#">2</a>
-                <a href="#">3</a>
-                <a href="#">4</a>
-                <a href="#">5</a>
-                <a href="#">&raquo;</a>
-            </div>
         </div>
     </div>
 
-    <!-- Include Modal -->
+    <!-- Include Sit-In Form Modal -->
     <?php include '../includes/sit-in-form.php'; ?>
 
     <script>
-        function confirmLogout() {
-            if (confirm("Are you sure you want to logout?")) {
-                window.location.href = "../includes/logout.php";
-            }
+        // Search Functionality
+        document.getElementById("searchInput").addEventListener("keyup", function() {
+            let filter = this.value.toUpperCase();
+            let rows = document.querySelectorAll("#studentTable tr");
+
+            rows.forEach(row => {
+                let text = row.textContent || row.innerText;
+                row.style.display = text.toUpperCase().includes(filter) ? "" : "none";
+            });
+        });
+
+        // Open Sit-In Modal
+        document.getElementById("openModalBtn").addEventListener("click", function() {
+            document.getElementById("sitInModal").style.display = "block";
+        });
+
+        document.addEventListener("DOMContentLoaded", function () {
+        console.log("DOM fully loaded!");
+
+        let sitInForm = document.getElementById("sitInForm");
+        
+        if (sitInForm) {
+            sitInForm.addEventListener("submit", function () {
+                console.log("Form is being submitted!");
+            });
+        } else {
+            console.log("sitInForm not found!");
         }
+    });
     </script>
 </body>
 </html>
