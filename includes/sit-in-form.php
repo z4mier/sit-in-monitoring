@@ -122,8 +122,7 @@
     .btn-close:hover {
         background-color: #d32f2f;
     }
-
-    .btn-sit-in {
+   .btn-sit-in {
         background-color: #007bff;
         color: white;
     }
@@ -131,6 +130,37 @@
     .btn-sit-in:hover {
         background-color:rgb(21, 88, 245);
     }
+    .modal-body input::placeholder,
+.modal-body select::placeholder {
+    color: #777; /* Same color for placeholders */
+}
+
+.modal-body select option {
+    color: white; /* Dropdown text matches input text color */
+    background-color: #212b40; /* Dropdown background matches input background */
+}
+.modal-body select {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 10px;
+    border: 1px solid #333;
+    border-radius: 5px;
+    font-size: 1em;
+    background-color: #212b40; /* Matches input background color */
+    color: #777; /* Text color */
+    outline: none;
+    transition: border 0.3s, box-shadow 0.3s;
+}
+
+.modal-body select:focus {
+    border: 1px solid #007bff; /* Highlight on focus */
+    box-shadow: 0px 0px 5px rgba(0, 123, 255, 0.5);
+}
+
+.modal-body select option {
+    background-color: #212b40; /* Matches input background */
+    color: white; /* Matches input text color */
+}
 
     /* Modal Fade-In Animation */
     @keyframes fadeIn {
@@ -163,26 +193,37 @@
         <input type="text" id="studentName" name="studentName" placeholder="Enter Student Name" required>
     </div>
     <div>
-        <label for="purpose">Purpose:</label>
-        <select id="purpose" name="purpose" required>
-            <option value="" disabled selected>Select Purpose</option>
-            <option value="Practice Session">Practice Session</option>
-            <option value="Laboratory Access">Laboratory Access</option>
-            <option value="Special Project">Special Project</option>
-            <option value="Extra Session">Extra Session</option>
-        </select>
-    </div>
-    <div>
-        <label for="lab">Lab #:</label>
-        <input type="text" id="lab" name="lab" placeholder="Enter Lab #" required>
-    </div>
+    <label for="purpose">Purpose:</label>
+    <select id="purpose" name="purpose" required>
+        <option value="" disabled selected hidden>Select Purpose</option> <!-- Hidden as a choice -->
+        <option value="ASP.Net Programming">ASP.Net Programming</option>
+        <option value="C Programming">C Programming</option>
+        <option value="C# Programming">C# Programming</option>
+        <option value="Java Programming">Java Programming</option>
+        <option value="PHP Programming">PHP Programming</option>
+    </select>
+</div>
+<div>
+    <label for="lab">Laboratory Number:</label>
+    <select id="lab" name="lab" required>
+        <option value="" disabled selected hidden>Select Lab Number</option> <!-- Hidden as a choice -->
+        <option value="524">524</option>
+        <option value="526">526</option>
+        <option value="528">528</option>
+        <option value="530">530</option>
+        <option value="540">540</option>
+        <option value="Mac Laboratory">Mac Laboratory</option>
+    </select>
+</div>
+
+
     <div>
         <label for="remainingSession">Remaining Session:</label>
         <input type="number" id="remainingSession" name="remainingSession" value="30" readonly>
     </div>
     <div class="modal-footer">
         <button type="button" class="btn-close" id="closeModalBtnFooter">Cancel</button>
-        <button type="submit" class="btn-sit-in">Sit In</button> <!-- Ensure this is inside the form -->
+        <button type="submit" class="btn-sit-in">Sit In</button>
     </div>
 </form>
 

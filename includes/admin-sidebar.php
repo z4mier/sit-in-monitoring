@@ -6,7 +6,7 @@
     <title>Admin Sidebar</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+        @import url('');
         
         .sidebar {
             display: flex;
@@ -15,7 +15,7 @@
             align-items: stretch; /* Align items to the left */
             width: 80px;
             height: 100vh;
-            background-color: #0d121e;
+            background-color: black;
             color: white;
             position: fixed;
             top: 0;
@@ -28,7 +28,7 @@
         }
 
         .sidebar:hover {
-            width: 250px;
+            width: 180px;
         }
 
         .sidebar .profile-image {
@@ -85,6 +85,7 @@
             transition: background-color 0.3s;
             border-radius: 10px;
             font-family: 'Inter', sans-serif;
+            font-size: 13px;
         }
 
         .sidebar a:hover {
@@ -92,7 +93,7 @@
         }
 
         .sidebar i {
-            font-size: 20px;
+            font-size: 17px;
             margin-right: 10px;
             margin-left: 10px;
             transition: margin 0.3s, font-size 0.3s;
@@ -116,9 +117,7 @@
 </head>
 <body>
     <div class="sidebar">
-        <!-- Profile Picture -->
-        <img src="../assets/icon.png" alt="Profile Image" class="profile-image">
-        <div class="admin-label">Admin</div>
+        
         
         <!-- Sidebar Links -->
         <div class="sidebar-links">
@@ -137,7 +136,7 @@
     <script>
         function confirmLogout() {
             if (confirm("Are you sure you want to logout?")) {
-                window.location.href = "includes/logout.php";
+                window.location.href = "../includes/logout.php";
             }
         }
     </script>
