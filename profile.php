@@ -1,23 +1,20 @@
 <?php
 session_start();
 
-// Redirect to login if not authenticated
 if (!isset($_SESSION['user'])) {
     header("Location: index.php");
     exit();
 }
 
-// Retrieve user details
 $user = $_SESSION['user'];
 $firstname = htmlspecialchars($user['firstname']);
 $middlename = isset($user['middlename']) ? htmlspecialchars($user['middlename']) : '';
 $lastname = htmlspecialchars($user['lastname']);
 $username = htmlspecialchars($user['username']);
 
-// Combine names to display full name
+// Combine to display full name
 $fullname = $firstname . ' ' . $middlename . ' ' . $lastname;
 
-// Database connection to fetch additional user details
 $conn = new mysqli("localhost", "root", "", "sysarch");
 
 if ($conn->connect_error) {
@@ -38,7 +35,7 @@ if ($result->num_rows == 1) {
     $profile_picture = htmlspecialchars($user_data['profile_picture']);
     $address = isset($user_data['address']) ? htmlspecialchars($user_data['address']) : '';  // Added check for address
     $email = htmlspecialchars($user_data['email']);
-    $remaining_sessions = 30;  // Default remaining session
+    $remaining_sessions = 30;  
 } else {
     echo "User data not found.";
     exit();
@@ -71,23 +68,23 @@ if ($result->num_rows == 1) {
         .content {
             flex-grow: 1;
             display: flex;
-            justify-content: center; /* Center horizontally */
-            align-items: center; /* Center vertically */
+            justify-content: center;
+            align-items: center;
             padding: 20px;
             box-sizing: border-box;
         }
         .card {
             padding: 20px;
             border-radius: 20px;
-            border: 2px solid white; /* Adds a white border */
-            box-shadow: 0 0 10px rgba(255, 255, 255, 0.3); /* Optional, adds a soft glow */
+            border: 2px solid white;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
             max-width: 500px;
-            width: 100%; /* Ensure the card takes full width up to max-width */
-            position: relative; /* For button positioning */
+            width: 100%;
+            position: relative;
         }
         .card h3 {
             text-align: center;
-            color: white; /* Highlighted header color */
+            color: white;
         }
         .profile-img {
             width: 120px;
@@ -143,7 +140,7 @@ if ($result->num_rows == 1) {
                     <p><strong>ID Number:</strong> <?php echo $id_no; ?></p>
                 </div>
                 <div class="detail-item">
-                    <p><strong>Full Name:</strong> <?php echo $fullname; ?></p>  <!-- Display full name -->
+                    <p><strong>Full Name:</strong> <?php echo $fullname; ?></p>
                 </div>
                 <div class="detail-item">
                     <p><strong>Year Level:</strong> <?php echo $yr_level; ?></p>
@@ -158,7 +155,7 @@ if ($result->num_rows == 1) {
                     <p><strong>Address:</strong> <?php echo $address; ?></p>
                 </div>
                 <div class="detail-item">
-                    <p><strong>Remaining Sessions:</strong> <?php echo $remaining_sessions; ?></p>  <!-- Display default remaining session -->
+                    <p><strong>Remaining Sessions:</strong> <?php echo $remaining_sessions; ?></p>
                 </div>
         </div>
     </div>

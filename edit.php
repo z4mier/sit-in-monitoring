@@ -1,30 +1,24 @@
 <?php 
 session_start(); 
 
-// Redirect to login if not authenticated
 if (!isset($_SESSION['user'])) { 
     header("Location: index.php"); 
     exit(); 
 } 
-
-// Ensure 'uploads' directory exists
 if (!file_exists('uploads')) { 
     mkdir('uploads', 0777, true); 
 } 
 
-// Retrieve user details from the session
 $user = $_SESSION['user']; 
 $firstname = htmlspecialchars($user['firstname']); 
 $lastname = htmlspecialchars($user['lastname']); 
 $username = htmlspecialchars($user['username']); 
 
-// Database connection to fetch additional user details
 $conn = new mysqli("localhost", "root", "", "sysarch"); 
 if ($conn->connect_error) { 
     die("Connection failed: " . $conn->connect_error); 
 } 
 
-// Fetch user details
 $sql = "SELECT * FROM users WHERE username = ?"; 
 $stmt = $conn->prepare($sql); 
 $stmt->bind_param("s", $username); 
@@ -71,17 +65,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             echo "Error uploading file. Please check folder permissions.";
         } 
     } else {
-        // Retain existing profile picture if no new image is uploaded
         $profile_picture = htmlspecialchars($user_data['profile_picture']);
     }
 
-    // Update user information in the database
     $update_sql = "UPDATE users SET firstname=?, middlename=?, lastname=?, yr_level=?, course=?, profile_picture=?, email=?, address=? WHERE username=?"; 
     $update_stmt = $conn->prepare($update_sql); 
     $update_stmt->bind_param("sssssssss", $new_firstname, $new_middlename, $new_lastname, $new_yr_level, $new_course, $profile_picture, $new_email, $new_address, $username); 
 
     if ($update_stmt->execute()) { 
-        // Update session variables
         $_SESSION['user']['firstname'] = $new_firstname; 
         $_SESSION['user']['middlename'] = $new_middlename; 
         $_SESSION['user']['lastname'] = $new_lastname; 
@@ -90,7 +81,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $_SESSION['user']['email'] = $new_email; 
         $_SESSION['user']['address'] = $new_address; 
 
-        // Redirect to profile page
         header("Location: profile.php"); 
         exit(); 
     } else { 
@@ -125,7 +115,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             border-radius: 20px;
             border: 2px solid white;
             max-width: 500px;
-            position: relative; /* For positioning the cancel button */
+            position: relative; 
         }
         .profile-section {
             display: flex;

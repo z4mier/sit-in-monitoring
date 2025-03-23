@@ -20,11 +20,11 @@
         .logos {
             display: flex;
             justify-content: center;
-            gap: 20px; /* Adds spacing between logos */
+            gap: 20px; 
             margin-bottom: 20px;
         }
         .logos img {
-            width: 95px; /* Adjust the size as needed */
+            width: 95px;
             height: auto;
         }
         .container {
@@ -32,11 +32,11 @@
             margin: 30px auto;
             display: flex;
             flex-direction: column;
-            gap: 20px; /* Adds spacing between cards */
+            gap: 20px;
         }
         .card {
-            border: 2px solid white; /* Adds a white border */
-            box-shadow: 0 0 10px rgba(255, 255, 255, 0.3); /* Optional, adds a soft glow */
+            border: 2px solid white;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
             color: white;
             padding: 20px;
             border-radius: 20px;
@@ -52,7 +52,7 @@
         }
         ul {
             padding-left: 20px;
-            list-style-type: disc; /* Displays bullets */
+            list-style-type: disc;
         }
     </style>
 </head>
