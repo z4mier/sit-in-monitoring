@@ -1,1 +1,1 @@
-A Sit-In Monitoring System using PHP.
+# CCS Sit-in Monitoring System
