@@ -1,7 +1,6 @@
 <?php
 session_start();
     
-// Database connection
 $conn = new mysqli("localhost", "root", "", "sysarch");
 
 if ($conn->connect_error) {

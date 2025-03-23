@@ -1,9 +1,8 @@
 <?php
 session_start();
 
-// Check if the user is logged in and has admin role
 if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
-    header("Location: index.php"); // Redirect to login page if not an admin
+    header("Location: index.php"); 
     exit();
 }
 ?>
@@ -25,14 +24,14 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
         }
 
         .main-content {
-            margin-left: 80px; /* Matches the default sidebar width */
+            margin-left: 80px;
             padding: 20px;
             transition: margin-left 0.3s;
             flex: 1;
         }
 
         .sidebar:hover ~ .main-content {
-            margin-left: 180px; /* Matches expanded sidebar width */
+            margin-left: 180px;
         }
 
         header {
@@ -57,7 +56,7 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
         }
 
         .card {
-            width: 220px; /* Fixed width */
+            width: 220px; 
             padding: 15px;
             background-color: #212b40;
             border-radius: 10px;
@@ -71,11 +70,11 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
         .card-header {
             display: flex;
             align-items: center;
-            gap: 5px; /* Space between icon and text */
+            gap: 5px;
         }
 
         .card-header i {
-            font-size: 18px; /* Icon size */
+            font-size: 18px;
             color: white;
         }
 
@@ -106,9 +105,7 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
     <!-- Include Sidebar -->
     <?php include '../includes/admin-sidebar.php'; ?>
 
-    <!-- Main Content -->
     <div class="main-content">
-        <!-- Header -->
         <header>
             <h1>Dashboard</h1>
         </header>
@@ -117,7 +114,7 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
         <section class="overview">
             <div class="card">
                 <div class="card-header">
-                    <i class="fas fa-user-graduate"></i> <!-- Student Icon -->
+                    <i class="fas fa-user-graduate"></i> 
                     <h3>Students Registered</h3>
                 </div>
                 <p class="number">100</p>
@@ -125,7 +122,7 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
 
             <div class="card">
                 <div class="card-header">
-                    <i class="fas fa-chair"></i> <!-- Sit-In Icon -->
+                    <i class="fas fa-chair"></i>
                     <h3>Current Sit-In</h3>
                 </div>
                 <p class="number">8</p>
@@ -133,14 +130,13 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
 
             <div class="card">
                 <div class="card-header">
-                    <i class="fas fa-chart-line"></i> <!-- Total Sit-In Icon -->
+                    <i class="fas fa-chart-line"></i>
                     <h3>Total Sit-In</h3>
                 </div>
                 <p class="number">5</p>
             </div>
         </section>
 
-        <!-- Chart Section -->
         <section class="chart-container">
             <h2>Statistics</h2>
             <canvas id="languageChart"></canvas>

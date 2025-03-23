@@ -4,9 +4,8 @@ include '../includes/db-connection.php';
 
 $sit_in_rows = '';
 
-// Check for success message from sit-in submission
 $success_message = isset($_SESSION['success_message']) ? $_SESSION['success_message'] : '';
-unset($_SESSION['success_message']); // Clear message after displaying
+unset($_SESSION['success_message']);
 
 $sql = "SELECT id, 
                id_no, 
@@ -15,7 +14,7 @@ $sql = "SELECT id,
                lab_number, 
                remaining_sessions  
         FROM sit_in_records 
-        ORDER BY id ASC"; // Default to ascending order
+        ORDER BY id ASC"; 
 
 $result = $conn->query($sql);
 
@@ -28,24 +27,27 @@ if ($result && $result->num_rows > 0) {
         $lab_number = htmlspecialchars($row['lab_number']);
         $remaining_sessions = htmlspecialchars($row['remaining_sessions']);
 
+        // Determine status based on remaining sessions
+        $status = ($remaining_sessions > 0) ? "Active" : "Inactive";
+
         $sit_in_rows .= "
-        <tr>
+        <tr id='row_$sit_in_id'>
             <td class='sit-in-id'>$sit_in_id</td>
             <td>$id_no</td>
             <td>$name</td>
             <td>$purpose</td>
             <td>$lab_number</td>
             <td>$remaining_sessions</td>
+            <td class='status'>$status</td>
             <td>
                 <button class='logout-btn' data-id='$sit_in_id'>Log-out</button>
             </td>
         </tr>";
     }
 } else {
-    $sit_in_rows = "<tr><td colspan='7'>No active sit-ins found.</td></tr>";
+    $sit_in_rows = "<tr><td colspan='8'>No active sit-ins found.</td></tr>";
 }
 
-// Close database connection
 $conn->close();
 ?>
 
@@ -127,10 +129,17 @@ $conn->close();
             cursor: pointer;
             border-radius: 20px;
             font-weight: bold;
+            position: relative;
+            z-index: 2;
         }
 
         .logout-btn:hover {
             background-color: whitesmoke;
+        }
+
+        td:last-child {
+            position: relative;
+            text-align: center;
         }
 
         .search-container {
@@ -155,7 +164,6 @@ $conn->close();
             color: black;
         }
 
-        /* Sorting Arrow */
         .sortable {
             display: flex;
             align-items: center;
@@ -170,44 +178,43 @@ $conn->close();
             transform: rotate(180deg);
         }
         
-/* Notification - Top Center */
-.notification {
-    display: none;
-    position: fixed;
-    top: 20px; /* Distance from the top */
-    left: 50%;
-    transform: translateX(-50%); /* Centers horizontally */
-    background-color: #181a25; /* Green success color */
-    color: white;
-    padding: 15px 25px;
-    border-radius: 20px;
-    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
-    font-size: 15px;
-    z-index: 1000;
-    text-align: center;
-    opacity: 0;
-    transition: opacity 0.5s ease-in-out;
-    display: flex;
-    align-items: center;
-    gap: 10px; /* Space between icon and text */
-}
+        td:nth-child(1) { 
+            text-align: left;
+            padding-left: 70px;
+        }
+        .notification {
+            display: none;
+            position: fixed;
+            top: 20px; 
+            left: 50%;
+            transform: translateX(-50%); 
+            background-color: #181a25; 
+            color: white;
+            padding: 15px 25px;
+            border-radius: 20px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+            font-size: 15px;
+            z-index: 1000;
+            text-align: center;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+            display: flex;
+            align-items: center;
+            gap: 10px; 
+        }
 
-.notification.show {
-    display: flex;
-    opacity: 1;
-}
+        .notification.show {
+            display: flex;
+            opacity: 1;
+        }
 
-.notification i {
-    font-size: 15px;
-    color: white;
-}
-
-
-
+        .notification i {
+            font-size: 15px;
+            color: white;
+        }
     </style>
 </head>
 <body>
-    <!-- Include Sidebar -->
     <?php include '../includes/admin-sidebar.php'; ?>
 
     <div class="main-content">
@@ -223,15 +230,15 @@ $conn->close();
             <table>
                 <thead>
                     <tr>
-                        <th class="sortable" id="sortSitInNumber">
-                            Sit-In Number
-                            <span class="sort-arrow" id="sortIcon">▲</span>
+                        <th class="sortable" id="sortSitInNumber" style="text-align: left;">
+                            Sit-In Number <span class="sort-arrow" id="sortIcon">▲</span>
                         </th>
                         <th>ID Number</th>
                         <th>Name</th>
                         <th>Purpose</th>
                         <th>Lab Number</th>
                         <th>Session</th>
+                        <th>Status</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -243,11 +250,67 @@ $conn->close();
     </div>
 
     <div id="successNotification" class="notification">
-    <i class="fas fa-check-circle"></i> <!-- Check icon -->
-    <span><?php echo $success_message; ?></span>
-</div>
+        <i class="fas fa-check-circle"></i> 
+        <span><?php echo $success_message; ?></span>
+    </div>
 
     <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            let ascending = true; 
+
+        document.getElementById("sortSitInNumber").addEventListener("click", function() {
+            let table = document.getElementById("sitInTable");
+            let rows = Array.from(table.rows);
+            let sortIcon = document.getElementById("sortIcon");
+
+            rows.sort((a, b) => {
+                let valA = parseInt(a.querySelector(".sit-in-id").textContent);
+                let valB = parseInt(b.querySelector(".sit-in-id").textContent);
+                return ascending ? valA - valB : valB - valA;
+            });
+
+        ascending = !ascending; 
+        sortIcon.textContent = ascending ? "▲" : "▼";
+        sortIcon.classList.toggle("asc", ascending);
+
+        table.innerHTML = "";
+        rows.forEach(row => table.appendChild(row));
+    });
+});
+
+    document.addEventListener("DOMContentLoaded", function () {
+        document.getElementById("sitInTable").addEventListener("click", function (event) {
+            if (event.target.classList.contains("logout-btn")) {
+                const sitInId = event.target.getAttribute("data-id");
+
+                if (confirm("Do you want to log out this user?")) {
+                    fetch(`../includes/logout-student.php?id=${sitInId}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.status === "success") {
+                                document.getElementById(`row_${sitInId}`).remove(); 
+                                showNotification(data.message); 
+                            } else {
+                                alert("Failed to log out: " + data.message);
+                            }
+                        })
+                        .catch(error => console.error("Error:", error));
+                }
+            }
+        });
+    });
+
+
+        function showNotification(message) {
+            const notification = document.getElementById("successNotification");
+            notification.innerHTML = `<i class="fas fa-check-circle"></i> ${message}`;
+            notification.classList.add("show");
+
+            setTimeout(() => {
+                notification.classList.remove("show");
+            }, 3000);
+}
+
         document.getElementById("searchInput").addEventListener("keyup", function() {
             let filter = this.value.toUpperCase();
             let rows = document.querySelectorAll("#sitInTable tr");
@@ -257,35 +320,6 @@ $conn->close();
             });
         });
 
-        // Sorting Functionality
-        let ascending = true;
-        document.getElementById("sortSitInNumber").addEventListener("click", function() {
-            let table = document.getElementById("sitInTable");
-            let rows = Array.from(table.rows);
-            let sortIcon = document.getElementById("sortIcon");
-
-            rows.sort((a, b) => {
-                let idA = parseInt(a.querySelector(".sit-in-id").textContent);
-                let idB = parseInt(b.querySelector(".sit-in-id").textContent);
-                return ascending ? idA - idB : idB - idA;
-            });
-
-            ascending = !ascending;
-            sortIcon.textContent = ascending ? "▲" : "▼";
-            table.innerHTML = "";
-            rows.forEach(row => table.appendChild(row));
-        });
-
-        // Show success notification if there's a message
-        const successMessage = "<?php echo $success_message; ?>";
-        if (successMessage.trim() !== "") {
-            const notification = document.getElementById("successNotification");
-            notification.classList.add("show");
-
-            setTimeout(() => {
-                notification.classList.remove("show");
-            }, 3000);
-        }
     </script>
 </body>
 </html>

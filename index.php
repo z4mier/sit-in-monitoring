@@ -1,7 +1,6 @@
 <?php
 session_start();
 
-// Database connection
 $conn = new mysqli("localhost", "root", "", "sysarch");
 
 if ($conn->connect_error) {
@@ -12,7 +11,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $username = trim($_POST['username']);
     $password = trim($_POST['password']);
 
-    // Check if user exists
     $sql = "SELECT * FROM users WHERE username = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("s", $username);
@@ -22,22 +20,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if ($result->num_rows == 1) {
         $user = $result->fetch_assoc();
 
-        // Debug output
         echo "<pre>";
         print_r($user);
         echo "</pre>";
 
-        // Verify password
         if (password_verify($password, $user['password'])) {
-            // Set session variables
+
             $_SESSION['user'] = [
                 'firstname' => $user['firstname'],
                 'lastname' => $user['lastname'],
                 'username' => $user['username'],
-                'role' => $user['role'] // Store role in session
+                'role' => $user['role']
             ];
 
-            // Redirect based on role
             if ($user['role'] === 'admin') {
                 header("Location: admin/admin-home.php");
             } else {

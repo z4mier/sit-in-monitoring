@@ -1,20 +1,33 @@
 <?php
-include '../includes/db-connection.php';
+include 'db-connection.php';
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $studentId = $_GET['id'];
+if (isset($_GET['id']) && is_numeric($_GET['id'])) {
+    $student_id = (int)$_GET['id']; 
 
-    // Prevent SQL injection
-    $stmt = $conn->prepare("DELETE FROM users WHERE id_no = ?");
-    $stmt->bind_param("s", $studentId);
+    $sql = "DELETE FROM users WHERE id_no = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $student_id);
 
     if ($stmt->execute()) {
-        http_response_code(200); // Success response
+        // If deletion is successful, redirect to admin-students.php with a success message
+        echo "<script>
+                alert('Student deleted successfully!');
+                window.location.href = '../admin/admin-students.php';
+              </script>";
     } else {
-        http_response_code(500); // Error response
+        // Handle SQL execution errors
+        echo "<script>
+                alert('Error deleting student: " . $stmt->error . "');
+                window.location.href = '../admin/admin-students.php';
+              </script>";
     }
 
     $stmt->close();
-    $conn->close();
+} else {
+    echo "<script>
+            alert('Invalid or missing ID parameter.');
+            window.location.href = '../admin/admin-students.php';
+          </script>";
 }
-?>
+
+$conn->close();
