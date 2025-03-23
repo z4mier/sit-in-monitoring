@@ -15,7 +15,7 @@
             align-items: stretch; /* Align items to the left */
             width: 80px;
             height: 100vh;
-            background-color: black;
+            background-color: #0d121e;
             color: white;
             position: fixed;
             top: 0;
@@ -51,13 +51,6 @@
             opacity: 1;
         }
 
-        .sidebar .admin-label {
-            display: none;
-            text-align: center;
-            font-size: 14px;
-            color: white;
-            margin-top: 5px;
-        }
 
         .sidebar:hover .admin-label {
             display: block;
@@ -85,7 +78,7 @@
             transition: background-color 0.3s;
             border-radius: 10px;
             font-family: 'Inter', sans-serif;
-            font-size: 13px;
+            font-size: 15px;
         }
 
         .sidebar a:hover {
@@ -124,7 +117,7 @@
             <a href="admin-home.php"><i class="fas fa-home"></i><span>Home</span></a>
             <a href="admin-students.php"><i class="fas fa-users"></i><span>Students</span></a>
             <a href="announcement.php"><i class="fas fa-bullhorn"></i><span>Announcement</span></a>
-            <a href="current-sit-in.php"><i class="fas fa-calendar-check"></i><span>Current Sit-In</span></a>
+            <a href="admin-current.php"><i class="fas fa-calendar-check"></i><span>Current Sit-In</span></a>
         </div>
         
         <!-- Logout Button -->

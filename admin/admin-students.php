@@ -135,14 +135,14 @@ $conn->close();
             border: none;
             border-radius: 5px;
             width: 200px;
-            background-color: #333;
-            color: #fff;
+            background-color: white;
+            color: black;
         }
 
         .search-container .search-icon {
             position: absolute;
             left: 10px;
-            color: #fff;
+            color: black;
         }
 
         .add-button {

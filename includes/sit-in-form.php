@@ -81,10 +81,6 @@
         outline: none;
     }
 
-    .modal-body input::placeholder {
-        color: #777;
-    }
-
     .modal-body input:focus {
         outline: none;
         border: 1px solid #007bff;
@@ -136,7 +132,6 @@
 }
 
 .modal-body select option {
-    color: white; /* Dropdown text matches input text color */
     background-color: #212b40; /* Dropdown background matches input background */
 }
 .modal-body select {
@@ -147,7 +142,7 @@
     border-radius: 5px;
     font-size: 1em;
     background-color: #212b40; /* Matches input background color */
-    color: #777; /* Text color */
+    color: white; /* Text color */
     outline: none;
     transition: border 0.3s, box-shadow 0.3s;
 }
@@ -195,7 +190,7 @@
     <div>
     <label for="purpose">Purpose:</label>
     <select id="purpose" name="purpose" required>
-        <option value="" disabled selected hidden>Select Purpose</option> <!-- Hidden as a choice -->
+        <option value="" disabled selected hidden>Select Purpose</option>
         <option value="ASP.Net Programming">ASP.Net Programming</option>
         <option value="C Programming">C Programming</option>
         <option value="C# Programming">C# Programming</option>
