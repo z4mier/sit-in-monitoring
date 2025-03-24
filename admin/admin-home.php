@@ -60,7 +60,7 @@ $conn->close();
         }
 
         .sidebar:hover ~ .main-content {
-            margin-left: 250px;
+            margin-left: 180px; /* Matches expanded sidebar width */
         }
                 
         header {
@@ -97,12 +97,12 @@ $conn->close();
         .card-header {
             display: flex;
             align-items: center;
-            gap: 5px;
-            justify-content: center;
+            gap: 5px; /* Space between icon and text */
         }
 
         .card-header i {
-            font-size: 18px;
+            font-size: 18px; /* Icon size */
+            color: white;
         }
 
         .overview .card h3 {
@@ -177,7 +177,7 @@ $conn->close();
             </div>
         </section>
 
-        <!-- Graph Section -->
+        <!-- Chart Section -->
         <section class="chart-container">
             <h2>Statistics</h2>
             <canvas id="purposeChart"></canvas>
