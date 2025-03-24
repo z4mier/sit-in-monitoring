@@ -1,10 +1,39 @@
 <?php
 session_start();
+include '../includes/db-connection.php';
 
 if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
     header("Location: index.php"); 
     exit();
 }
+
+// Fetch the total number of registered students
+$sql_users = "SELECT COUNT(*) as total_users FROM users";
+$result_users = $conn->query($sql_users);
+$total_users = ($result_users->num_rows > 0) ? $result_users->fetch_assoc()['total_users'] : 0;
+
+// Fetch the current sit-ins (students with no end_time)
+$sql_current_sitin = "SELECT COUNT(*) as current_sitin FROM sit_in_records";
+$result_current_sitin = $conn->query($sql_current_sitin);
+$current_sitin = ($result_current_sitin->num_rows > 0) ? $result_current_sitin->fetch_assoc()['current_sitin'] : 0;
+
+// Fetch total sit-ins ever recorded
+$sql_total_sitin = "SELECT COUNT(*) as total_sitin FROM sit_in_records";
+$result_total_sitin = $conn->query($sql_total_sitin);
+$total_sitin = ($result_total_sitin->num_rows > 0) ? $result_total_sitin->fetch_assoc()['total_sitin'] : 0;
+
+// Fetch sit-in purposes and their counts
+$sql_purpose = "SELECT purpose, COUNT(*) as count FROM sit_in_records GROUP BY purpose";
+$result_purpose = $conn->query($sql_purpose);
+
+$purposes = [];
+$counts = [];
+while ($row = $result_purpose->fetch_assoc()) {
+    $purposes[] = $row['purpose'];
+    $counts[] = $row['count'];
+}
+
+$conn->close();
 ?>
 
 <!DOCTYPE html>
@@ -21,8 +50,8 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
             font-family: 'Inter', sans-serif;
             display: flex;
             background-color: #0d121e;
+            color: #ffffff;
         }
-
         .main-content {
             margin-left: 80px;
             padding: 20px;
@@ -31,15 +60,15 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
         }
 
         .sidebar:hover ~ .main-content {
-            margin-left: 180px;
+            margin-left: 250px;
         }
-
+                
         header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             padding: 20px;
-            border-bottom: 2px solid #ddd;
+            border-bottom: 2px solid #333;
         }
 
         header h1 {
@@ -61,26 +90,23 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
             background-color: #212b40;
             border-radius: 10px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            text-align: left;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            text-align: center;
+            color: white;
         }
 
         .card-header {
             display: flex;
             align-items: center;
             gap: 5px;
+            justify-content: center;
         }
 
         .card-header i {
             font-size: 18px;
-            color: white;
         }
 
         .overview .card h3 {
             margin-bottom: 10px;
-            color: white;
             font-weight: 400;
             font-size: 15px;
         }
@@ -89,15 +115,29 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
             margin: 0;
             font-size: 25px;
             font-weight: bold;
-            color: white;
         }
 
         .chart-container {
-            margin-top: 40px;
+            margin-top: 20px;
+            text-align: center;
         }
 
         .chart-container h2 {
-            color: white; 
+            color: white;
+            font-size: 25px;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        #purposeChart {
+            width: 100% !important;  /* Reduce size */
+            height: 500px !important;
+            max-width: 100%;
+            display: block;
+            margin: 0 auto;
+            background-color: #1a2336;
+            padding: 10px;
+            border-radius: 10px;
         }
     </style>
 </head>
@@ -117,7 +157,7 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
                     <i class="fas fa-user-graduate"></i> 
                     <h3>Students Registered</h3>
                 </div>
-                <p class="number">100</p>
+                <p class="number"><?= $total_users; ?></p>
             </div>
 
             <div class="card">
@@ -125,7 +165,7 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
                     <i class="fas fa-chair"></i>
                     <h3>Current Sit-In</h3>
                 </div>
-                <p class="number">8</p>
+                <p class="number"><?= $current_sitin; ?></p>
             </div>
 
             <div class="card">
@@ -133,14 +173,55 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
                     <i class="fas fa-chart-line"></i>
                     <h3>Total Sit-In</h3>
                 </div>
-                <p class="number">5</p>
+                <p class="number"><?= $total_sitin; ?></p>
             </div>
         </section>
 
+        <!-- Graph Section -->
         <section class="chart-container">
             <h2>Statistics</h2>
-            <canvas id="languageChart"></canvas>
+            <canvas id="purposeChart"></canvas>
         </section>
     </div>
+
+    <script>
+        var ctx = document.getElementById('purposeChart').getContext('2d');
+        var purposeChart = new Chart(ctx, {
+            type: 'bar', 
+            data: {
+                labels: <?= json_encode($purposes); ?>,
+                datasets: [{
+                    label: 'Number of Students',
+                    data: <?= json_encode($counts); ?>,
+                    backgroundColor: [
+                        '#3A7CA5',
+                        '#1E5F74',
+                        '#144272',
+                        '#2B4865',
+                        '#0F3460'
+                    ],
+                    borderColor: '#ffffff',
+                    borderWidth: 1,
+                    borderRadius: 5
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false, // Allows size adjustment
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: { color: '#fff' }
+                    },
+                    x: {
+                        ticks: { color: '#fff' }
+                    }
+                }
+            }
+        });
+    </script>
 </body>
 </html>

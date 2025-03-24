@@ -53,8 +53,8 @@ $lastname = htmlspecialchars($user['lastname']);
         width: 45%; 
         box-sizing: border-box; 
         background-color: #0d121e;
-        border: 2px solid white; /* Adds a white border */
-        box-shadow: 0 0 10px rgba(255, 255, 255, 0.3); /* Optional, adds a soft glow */
+        border: 2px solid white;
+        box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
     }
 
     .events-section h3 {
@@ -92,7 +92,7 @@ $lastname = htmlspecialchars($user['lastname']);
 
     @media screen and (max-width: 768px) {
     .card {
-        flex: 1 1 calc(45% - 20px); /* Two cards per row on smaller screens */
+        flex: 1 1 calc(45% - 20px); 
     }
 }
 

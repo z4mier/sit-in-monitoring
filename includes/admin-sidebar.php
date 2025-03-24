@@ -10,9 +10,9 @@
         
         .sidebar {
             display: flex;
-            flex-direction: column; /* Stack items vertically */
-            justify-content: space-between; /* Push content to top and bottom */
-            align-items: stretch; /* Align items to the left */
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: stretch; 
             width: 80px;
             height: 100vh;
             background-color: #0d121e;
@@ -22,7 +22,7 @@
             left: 0;
             padding: 20px 0;
             box-sizing: border-box;
-            text-align: left; /* Left-align the text */
+            text-align: left;
             transition: width 0.3s;
             border-right: 3px solid #181a25;
         }
@@ -35,13 +35,13 @@
             width: 65px;
             height: 65px;
             border-radius: 50%;
-            margin: 20px auto 10px auto; /* Adjusted margin to move closer to username */
+            margin: 20px auto 10px auto;
             transition: width 0.3s, height 0.3s;
         }
 
         .sidebar .user-info {
             text-align: center;
-            margin: 0; /* Removed margin to move closer to profile image */
+            margin: 0;
             opacity: 0;
             transition: opacity 0.3s;
             margin-bottom: 20px;
@@ -57,16 +57,16 @@
         }
 
         .sidebar-links {
-            flex-grow: 1; /* Makes the links section take remaining space */
+            flex-grow: 1; 
             display: flex;
             flex-direction: column;
-            gap: 10px; /* Adds space between links */
-            padding: 0 10px; /* Add left-right padding for spacing */
-            margin-top: 20px; /* Adds space between admin label and first link */
+            gap: 10px;
+            padding: 0 10px; 
+            margin-top: 20px; 
         }
 
         .sidebar-logout {
-            padding: 0 10px; /* Ensure alignment with other items */
+            padding: 0 10px; 
         }
 
         .sidebar a {
@@ -74,7 +74,7 @@
             text-decoration: none;
             display: flex;
             align-items: center;
-            padding: 10px 10px; /* Ensure consistent spacing for all links */
+            padding: 10px 10px; 
             transition: background-color 0.3s;
             border-radius: 10px;
             font-family: 'Inter', sans-serif;
@@ -116,7 +116,7 @@
         <div class="sidebar-links">
             <a href="admin-home.php"><i class="fas fa-home"></i><span>Home</span></a>
             <a href="admin-students.php"><i class="fas fa-users"></i><span>Students</span></a>
-            <a href="announcement.php"><i class="fas fa-bullhorn"></i><span>Announcement</span></a>
+            <a href="admin-announcements.php"><i class="fas fa-bullhorn"></i><span>Announcement</span></a>
             <a href="admin-current.php"><i class="fas fa-calendar-check"></i><span>Current Sit-In</span></a>
         </div>
         
