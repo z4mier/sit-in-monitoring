@@ -202,7 +202,7 @@ $history_result = $history_stmt->get_result();
     <div class="modal-content">
         <span class="close" onclick="closeFeedbackModal()">&times;</span>
         <h3>Submit Feedback</h3>
-        <form method="POST" action="submit_feedback.php">
+        <form method="POST" action="includes/submit-feedback.php">
             <input type="hidden" id="feedback_record_id" name="record_id">
             <textarea name="feedback" placeholder="Enter your feedback here..." required></textarea>
             <div style="text-align: right;">
@@ -211,6 +211,7 @@ $history_result = $history_stmt->get_result();
         </form>
     </div>
 </div>
+
 
 
 <script>
