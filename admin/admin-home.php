@@ -60,7 +60,7 @@ $conn->close();
         }
 
         .sidebar:hover ~ .main-content {
-            margin-left: 180px; /* Matches expanded sidebar width */
+            margin-left: 180px;
         }
                 
         header {
@@ -97,11 +97,11 @@ $conn->close();
         .card-header {
             display: flex;
             align-items: center;
-            gap: 5px; /* Space between icon and text */
+            gap: 5px;
         }
 
         .card-header i {
-            font-size: 18px; /* Icon size */
+            font-size: 18px; 
             color: white;
         }
 
@@ -119,22 +119,21 @@ $conn->close();
 
         .chart-container {
             margin-top: 20px;
-            text-align: center;
+            text-align: left;
         }
 
         .chart-container h2 {
             color: white;
             font-size: 25px;
             margin-bottom: 20px;
-            text-align: left;
         }
 
         #purposeChart {
-            width: 100% !important;  /* Reduce size */
+            width: 100% !important; 
             height: 500px !important;
             max-width: 100%;
             display: block;
-            margin: 0 auto;
+            margin: 0;
             background-color: #1a2336;
             padding: 10px;
             border-radius: 10px;
@@ -147,7 +146,7 @@ $conn->close();
 
     <div class="main-content">
         <header>
-            <h1>Dashboard</h1>
+            <h1>Admin - Dashboard</h1>
         </header>
 
         <!-- Overview Section -->
@@ -207,7 +206,7 @@ $conn->close();
             },
             options: {
                 responsive: true,
-                maintainAspectRatio: false, // Allows size adjustment
+                maintainAspectRatio: false,
                 plugins: {
                     legend: { display: false }
                 },

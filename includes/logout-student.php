@@ -1,23 +1,18 @@
 <?php
-session_start();
 include 'db-connection.php';
 
 if (isset($_GET['id'])) {
     $sit_in_id = $_GET['id'];
 
-    $sql = "DELETE FROM sit_in_records WHERE id = ?";
-    $stmt = $conn->prepare($sql);
+    $stmt = $conn->prepare("DELETE FROM sit_in_records WHERE id = ?");
     $stmt->bind_param("i", $sit_in_id);
-
+    
     if ($stmt->execute()) {
-        echo json_encode(["status" => "success", "message" => "User successfully logged out."]);
+        echo json_encode(['status' => 'success', 'message' => 'Student has been logged out.']);
     } else {
-        echo json_encode(["status" => "error", "message" => "Error: " . $stmt->error]);
+        echo json_encode(['status' => 'error', 'message' => 'Failed to remove sit-in.']);
     }
-
-    $stmt->close();
-    $conn->close();
 } else {
-    echo json_encode(["status" => "error", "message" => "Error: No ID provided."]);
+    echo json_encode(['status' => 'error', 'message' => 'No ID provided.']);
 }
 ?>

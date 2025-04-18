@@ -7,6 +7,8 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
+$error = ""; // Default empty
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $username = trim($_POST['username']);
     $password = trim($_POST['password']);
@@ -20,12 +22,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if ($result->num_rows == 1) {
         $user = $result->fetch_assoc();
 
-        echo "<pre>";
-        print_r($user);
-        echo "</pre>";
-
         if (password_verify($password, $user['password'])) {
-
             $_SESSION['user'] = [
                 'firstname' => $user['firstname'],
                 'lastname' => $user['lastname'],
@@ -40,14 +37,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             }
             exit();
         } else {
-            echo "Password does not match.";
+            $error = "Incorrect password. Please try again.";
         }
     } else {
-        echo "User not found in database.";
+        $error = "User not found. Please check your username.";
     }
 }
-
 ?>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -58,36 +55,43 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
     body {
         font-family: 'Inter', sans-serif;
-            background-image: url('assets/bg.jpg');
-            background-size: cover;
-            background-repeat: no-repeat;
-            background-attachment: fixed;
-            margin: 0;
-            padding: 0;
-        }
-        input[type="text"], input[type="password"] {
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 10px;
-            border: 1px solid #ccc;
-            border-radius: 25px;
-            box-sizing: border-box;
-            font-size: 16px;
-            background-color: #f7f7f7;
-        }
-        input[type="submit"] {
-            width: 100%;
-            background-color: #144d94;
-            color: white;
-            padding: 10px;
-            border: none;
-            border-radius: 25px;
-            cursor: pointer;
-            font-size: 15px;
-        }
-        input[type="submit"]:hover {
-            background-color: #113d74;
-        }
+        background-image: url('assets/bg.jpg');
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        margin: 0;
+        padding: 0;
+    }
+    input[type="text"], input[type="password"] {
+        width: 100%;
+        padding: 12px;
+        margin-bottom: 10px;
+        border: 1px solid #ccc;
+        border-radius: 25px;
+        box-sizing: border-box;
+        font-size: 16px;
+        background-color: #f7f7f7;
+    }
+    input[type="submit"] {
+        width: 100%;
+        background-color: #144d94;
+        color: white;
+        padding: 10px;
+        border: none;
+        border-radius: 25px;
+        cursor: pointer;
+        font-size: 15px;
+    }
+    input[type="submit"]:hover {
+        background-color: #113d74;
+    }
+    .error-message {
+        color: red;
+        text-align: center;
+        font-size: 14px;
+        margin-bottom: 15px;
+        font-weight: bold;
+    }
     </style>
 </head>
 <body>
@@ -97,7 +101,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <img src="assets/ccs.png" alt="CCS Logo" style="width: 100px; height: auto;">
         </div>
         <h1 style="text-align: center; font-size: 25px; margin-bottom: 20px;">CCS Sit-In Monitoring System</h1>
-        <?php if (isset($error)) echo "<p style='color: red; text-align: center;'>$error</p>"; ?>
+
+        <?php if (!empty($error)): ?>
+            <div class="error-message"><?php echo $error; ?></div>
+        <?php endif; ?>
+
         <form method="POST" action="">
             <div style="margin-bottom: 20px;">
                 <label for="username" style="display: block; font-weight: bold; margin-bottom: 5px;">Username:</label>
@@ -111,6 +119,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <input type="submit" value="Login">
             </div>
         </form>
+
         <div style="text-align: center; margin-top: 20px; font-size: 15px;">
             <p>Don't have an account? <a href="register.php" style="color: #144d94;">Register here</a></p>
         </div>

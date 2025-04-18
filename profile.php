@@ -11,8 +11,6 @@ $firstname = htmlspecialchars($user['firstname']);
 $middlename = isset($user['middlename']) ? htmlspecialchars($user['middlename']) : '';
 $lastname = htmlspecialchars($user['lastname']);
 $username = htmlspecialchars($user['username']);
-
-// Combine to display full name
 $fullname = $firstname . ' ' . $middlename . ' ' . $lastname;
 
 $conn = new mysqli("localhost", "root", "", "sysarch");
@@ -33,9 +31,22 @@ if ($result->num_rows == 1) {
     $yr_level = htmlspecialchars($user_data['yr_level']);
     $course = htmlspecialchars($user_data['course']);
     $profile_picture = htmlspecialchars($user_data['profile_picture']);
-    $address = isset($user_data['address']) ? htmlspecialchars($user_data['address']) : '';  // Added check for address
+    $address = isset($user_data['address']) ? htmlspecialchars($user_data['address']) : '';
     $email = htmlspecialchars($user_data['email']);
-    $remaining_sessions = 30;  
+
+    // Fetch remaining_sessions from sit_in_records table
+    $session_query = "SELECT remaining_sessions FROM sit_in_records WHERE id_no = ? ORDER BY id DESC LIMIT 1";
+    $session_stmt = $conn->prepare($session_query);
+    $session_stmt->bind_param("s", $id_no);
+    $session_stmt->execute();
+    $session_result = $session_stmt->get_result();
+
+    if ($session_result && $session_result->num_rows > 0) {
+        $session_data = $session_result->fetch_assoc();
+        $remaining_sessions = (int) $session_data['remaining_sessions'];
+    } else {
+        $remaining_sessions = 30;
+    }
 } else {
     echo "User data not found.";
     exit();
@@ -124,9 +135,6 @@ if ($result->num_rows == 1) {
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1>CCS Sit-In Monitoring System</h1>
-    </div>
     <?php include 'includes/sidebar.php'; ?>
     <div class="content">
         <div class="card">

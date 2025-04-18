@@ -1,47 +1,46 @@
 <?php
-ini_set('display_errors', 1);
-ob_start();
 session_start();
+include 'db-connection.php';
 
-$conn = new mysqli("localhost", "root", "", "sysarch");
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    $id_no = $_POST['id_no'];
+    $name = $_POST['name'];
+    $purpose = $_POST['purpose'];
+    $lab_number = $_POST['lab_number'];
+    $remaining_sessions = (int)$_POST['remaining_sessions'];
 
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
-
-// Check if form is submitted via POST
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-
-    $idNumber = isset($_POST['idNumber']) ? trim($_POST['idNumber']) : '';
-    $studentName = isset($_POST['studentName']) ? trim($_POST['studentName']) : '';
-    $purpose = isset($_POST['purpose']) ? trim($_POST['purpose']) : '';
-    $lab = isset($_POST['lab']) ? trim($_POST['lab']) : '';
-    $remainingSessions = isset($_POST['remainingSession']) ? (int) $_POST['remainingSession'] : 0;
-
-    if (empty($idNumber) || empty($studentName) || empty($purpose) || empty($lab)) {
-        die("Error: Missing required fields.");
+    if ($remaining_sessions <= 0) {
+        $_SESSION['success_message'] = "Sit-In failed: No remaining sessions.";
+        header("Location: ../admin/admin-current.php");
+        exit();
     }
 
-    $sql = "INSERT INTO sit_in_records (id_no, name, purpose, lab_number, remaining_sessions) 
-            VALUES (?, ?, ?, ?, ?)";
+    $conn->begin_transaction();
 
-    if ($stmt = $conn->prepare($sql)) {
-        $stmt->bind_param("ssssi", $idNumber, $studentName, $purpose, $lab, $remainingSessions);
+    try {
+        // 1. Insert into sit_in_records
+        $insert_sql = "INSERT INTO sit_in_records (id_no, name, purpose, lab_number, remaining_sessions) VALUES (?, ?, ?, ?, ?)";
+        $stmt = $conn->prepare($insert_sql);
+        $stmt->bind_param("ssssi", $id_no, $name, $purpose, $lab_number, $remaining_sessions);
+        $stmt->execute();
 
-        if ($stmt->execute()) {
-            $_SESSION['success_message'] = "Student sit-in successfully!";
-            $stmt->close();
-            $conn->close();
-            header("Location: ../admin/admin-current.php");
-            exit();
-        } else {
-            die("Error inserting record: " . $stmt->error);
-        }
-    } else {
-        die("Error in SQL preparation: " . $conn->error);
+        // 2. Decrement remaining_sessions in users
+        $new_remaining = $remaining_sessions - 1;
+        $update_sql = "UPDATE users SET remaining_sessions = ? WHERE id_no = ?";
+        $stmt = $conn->prepare($update_sql);
+        $stmt->bind_param("is", $new_remaining, $id_no);
+        $stmt->execute();
+
+        $conn->commit();
+        $_SESSION['success_message'] = "Sit-In successfully recorded for $name!";
+    } catch (Exception $e) {
+        $conn->rollback();
+        $_SESSION['success_message'] = "Sit-In failed: " . $e->getMessage();
     }
-}
 
-$conn->close();
-ob_end_flush();
+    header("Location: ../admin/admin-current.php");
+    exit();
+} else {
+    echo "Invalid request.";
+}
 ?>

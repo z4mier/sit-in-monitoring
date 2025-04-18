@@ -34,13 +34,12 @@ if ($result->num_rows == 1) {
     $profile_picture = htmlspecialchars($user_data['profile_picture']); 
     $email = htmlspecialchars($user_data['email']); 
     $address = htmlspecialchars($user_data['address']); 
-    $remaining_sessions = isset($user_data['remaining_sessions']) ? $user_data['remaining_sessions'] : 30; // Default value
+    $remaining_sessions = isset($user_data['remaining_sessions']) ? $user_data['remaining_sessions'] : 30;
 } else { 
     echo "User data not found."; 
     exit(); 
 } 
 
-// Handle form submission
 if ($_SERVER["REQUEST_METHOD"] == "POST") { 
     $new_firstname = htmlspecialchars($_POST['firstname']); 
     $new_middlename = htmlspecialchars($_POST['middlename']); 
@@ -50,7 +49,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $new_email = htmlspecialchars($_POST['email']); 
     $new_address = htmlspecialchars($_POST['address']); 
 
-    // Handle file upload
     if (isset($_FILES['profile_picture']) && $_FILES['profile_picture']['error'] == 0) { 
         $target_dir = "uploads/"; 
         $file_name = uniqid() . '-' . preg_replace("/[^a-zA-Z0-9\.\-\_]/", "", basename($_FILES["profile_picture"]["name"]));
@@ -58,11 +56,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         if (move_uploaded_file($_FILES["profile_picture"]["tmp_name"], $target_file)) { 
             $profile_picture = $target_file; 
-    
-            // Update session
             $_SESSION['user']['profile_picture'] = $profile_picture; 
         } else { 
-            echo "Error uploading file. Please check folder permissions.";
+            echo "Error uploading file.";
         } 
     } else {
         $profile_picture = htmlspecialchars($user_data['profile_picture']);
@@ -94,7 +90,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CCS Sit-In Monitoring System</title>
+    <title>Sit-In Monitoring System</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
         body {
@@ -103,11 +99,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             margin: 0;
             padding: 0;
         }
+
         .header {
             color: white;
             padding: 15px 15px;
             text-align: center;
         }
+
         .card {
             color: white;
             padding: 20px;
@@ -117,6 +115,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             max-width: 500px;
             position: relative; 
         }
+
         .profile-section {
             display: flex;
             flex-direction: column;
@@ -124,17 +123,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             text-align: center;
             flex: 1;
         }
+
+        .profile-section h2 {
+            margin-bottom: 15px;
+        }
+
         .profile-img {
-            width: 150px;
-            height: 150px;
+            width: 120px;
+            height: 120px;
             border-radius: 50%;
             object-fit: cover;
-            margin-bottom: 10px;
-        }
+            cursor: pointer;
+            transition: transform 0.2s ease-in-out;
+        }      
         .form-group {
             margin-bottom: 10px;
             width: 100%;
         }
+
         .form-group label {
             display: block;
             margin-bottom: 5px;
@@ -142,6 +148,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             font-size: 16px;
             color: white;
         }
+
         .form-group input, .form-group select {
             width: 100%;
             padding: 10px;
@@ -168,24 +175,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             cursor: pointer;
             text-align: center;
         }
+
         .save-btn:hover {
             background-color: white;
             color: #181a25; 
         }
-        .change-btn {
-            padding: 8px 12px;
-            font-size: 14px;
-            color: white;
-            background-color: #0d121e;
-            border: 1px solid white;
-            border-radius: 10px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-        .change-btn:hover {
-            background-color: white;
-            color: #181a25; 
-        }
+
         .cancel-btn {
             position: absolute;
             top: 20px;
@@ -196,27 +191,30 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             font-size: 25px;
             cursor: pointer;
         }
+
         .cancel-btn:hover {
-            color: #00bcd4;
+            color: red;
         }
     </style>
 </head>
 <body>
 <div class="header">
-    <h1>CCS Sit-In Monitoring System</h1>
     <?php include 'includes/sidebar.php'; ?>
 </div>
 <div class="card">
     <button class="cancel-btn" onclick="window.location.href='profile.php'">&times;</button>
     <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" enctype="multipart/form-data">
-        <!-- Profile Picture Section -->
-        <div class="profile-section">
-            <img id="profilePreview" src="<?php echo $profile_picture ? $profile_picture : 'assets/icon.png'; ?>" alt="Profile Picture" class="profile-img">
-            <input type="file" id="profileInput" name="profile_picture" style="display: none;" accept="image/*">
-            <button type="button" class="change-btn" onclick="triggerFileInput()">Change</button>
-        </div>
+        <!-- Profile Picture Section with Title BELOW -->
+<div class="profile-section">
+    <label for="profileInput">
+        <img id="profilePreview" src="<?php echo $profile_picture ? $profile_picture : 'assets/icon.png'; ?>" alt="Profile Picture" class="profile-img">
+    </label>
+    <input type="file" id="profileInput" name="profile_picture" style="display: none;" accept="image/*">
+    <h2 style="margin-top: 15px; font-size: 20px;">Edit Information</h2>
+</div>
 
-        <!-- User Details Section -->
+
+        <!-- Editable Form Fields -->
         <div class="form-group">
             <label for="firstname">First Name:</label>
             <input type="text" id="firstname" name="firstname" value="<?php echo $firstname; ?>">
@@ -265,6 +263,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         document.getElementById("profileInput").click();
     }
 
+    // Click on profile image triggers file input
     document.getElementById("profileInput").addEventListener("change", function (event) {
         const file = event.target.files[0];
         if (file) {

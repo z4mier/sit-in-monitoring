@@ -1,113 +1,138 @@
+<?php
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+include 'db-connection.php';
+
+if (!isset($_POST['query'])) {
+    echo "<script>alert('No search input provided.');</script>";
+    exit;
+}
+
+$query = trim($_POST['query']);
+
+// Search by ID number or full name
+$stmt = $conn->prepare("SELECT * FROM users WHERE id_no = ? OR CONCAT(firstname, ' ', middlename, ' ', lastname) LIKE ?");
+$likeQuery = "%$query%";
+$stmt->bind_param("ss", $query, $likeQuery);
+$stmt->execute();
+$result = $stmt->get_result();
+
+if ($result->num_rows === 0) {
+    echo "<script>alert('No matching student found.');</script>";
+    exit;
+}
+
+$row = $result->fetch_assoc();
+
+$id = htmlspecialchars($row['id_no']);
+$name = htmlspecialchars($row['firstname'] . ' ' . $row['middlename'] . ' ' . $row['lastname']);
+$course = htmlspecialchars($row['course']);
+$year = htmlspecialchars($row['yr_level']);
+$remaining = htmlspecialchars($row['remaining_sessions']);
+?>
+
+<!-- ✅ MODAL STYLE (follows your provided theme) -->
 <style>
-    /* Modal Background Styling */
     .modal {
-        display: none; /* Hidden by default */
+        display: flex;
         position: fixed;
-        z-index: 1;
+        z-index: 9999;
         left: 0;
         top: 0;
         width: 100%;
         height: 100%;
-        overflow: auto; /* Allows scrolling if content overflows */
-        background-color: rgba(0, 0, 0, 0.5); /* Dim overlay */
-        display: flex; /* Flexbox to center modal */
-        justify-content: center; /* Center horizontally */
-        align-items: center; /* Center vertically */
-        align-items: flex-start; 
+        background-color: rgba(0, 0, 0, 0.6);
+        justify-content: center;
+        align-items: flex-start;
+        padding-top: 80px;
     }
 
-    /* Modal Content Styling */
     .modal-content {
         background-color: #0d121e;
-        margin: 0 auto; /* Removes extra margin that pushes it down */
-        padding: 20px;
-        border-radius: 8px;
-        width: 50%;
-        max-width: 500px; /* Ensures it doesn’t get too wide */
-        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
-        animation: fadeIn 0.5s;
-        margin-top: 50px;
+        padding: 25px;
+        border-radius: 10px;
+        width: 95%;
+        max-width: 500px;
+        animation: fadeIn 0.4s ease-in-out;
+        box-shadow: 0px 5px 15px rgba(0,0,0,0.4);
     }
 
-    /* Header Section Styling */
     .modal-header {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        border-bottom: 2px solid #ddd;
+        border-bottom: 2px solid #333;
+        padding-bottom: 10px;
     }
 
     .modal-header h2 {
         margin: 0;
-        font-size: 1.5em;
+        font-size: 1.5rem;
         color: white;
     }
 
     .close {
+        font-size: 1.5rem;
         cursor: pointer;
-        font-size: 1.5em;
-        color: #777;
-        transition: color 0.3s;
+        color: #aaa;
     }
 
     .close:hover {
         color: #ff5c5c;
     }
 
-    /* Form Styling */
     .modal-body form {
         display: flex;
         flex-direction: column;
         gap: 15px;
+        margin-top: 20px;
     }
 
     .modal-body label {
         font-weight: bold;
         color: white;
-        display: block; /* Ensures the label takes a full line */
-        margin-bottom: 10px; 
     }
 
-    .modal-body input {
-        width: 100%; /* Ensures all inputs take up the same width */
-        box-sizing: border-box;
+    .modal-body input,
+    .modal-body select {
+        width: 100%;
         padding: 10px;
-        border: 1px solid #333;
         border-radius: 5px;
-        font-size: 1em;
+        border: 1px solid #333;
         background-color: #212b40;
         color: white;
-        transition: border 0.3s;
-        outline: none;
     }
 
-    .modal-body input:focus {
-        outline: none;
-        border: 1px solid #007bff;
-        box-shadow: 0px 0px 5px rgba(0, 123, 255, 0.5);
-    }
-    .modal-body label[for="idNumber"] {
-         margin-top: 20px; 
+    .modal-body select option {
+        background-color: #212b40;
+        color: white;
     }
 
-    /* Footer Button Styling */
     .modal-footer {
         display: flex;
         justify-content: flex-end;
         gap: 10px;
-        border-top: 2px solid #ddd;
-        margin-top: 20px;
+        border-top: 2px solid #333;
         padding-top: 10px;
+        margin-top: 15px;
     }
 
-    .btn-close,
-    .btn-sit-in {
+    .btn-sit-in,
+    .btn-close {
         padding: 10px 15px;
         border: none;
         border-radius: 5px;
-        font-size: 1em;
+        font-size: 1rem;
         cursor: pointer;
-        transition: background-color 0.3s, color 0.3s;
+    }
+
+    .btn-sit-in {
+        background-color: #007bff;
+        color: white;
+    }
+
+    .btn-sit-in:hover {
+        background-color: #0056b3;
     }
 
     .btn-close {
@@ -118,50 +143,11 @@
     .btn-close:hover {
         background-color: #d32f2f;
     }
-   .btn-sit-in {
-        background-color: #007bff;
-        color: white;
-    }
 
-    .btn-sit-in:hover {
-        background-color:rgb(21, 88, 245);
-    }
-    .modal-body input::placeholder,
-.modal-body select::placeholder {
-    color: #777; /* Same color for placeholders */
-}
-
-.modal-body select option {
-    background-color: #212b40; /* Dropdown background matches input background */
-}
-.modal-body select {
-    width: 100%;
-    box-sizing: border-box;
-    padding: 10px;
-    border: 1px solid #333;
-    border-radius: 5px;
-    font-size: 1em;
-    background-color: #212b40; /* Matches input background color */
-    color: white; /* Text color */
-    outline: none;
-    transition: border 0.3s, box-shadow 0.3s;
-}
-
-.modal-body select:focus {
-    border: 1px solid #007bff; /* Highlight on focus */
-    box-shadow: 0px 0px 5px rgba(0, 123, 255, 0.5);
-}
-
-.modal-body select option {
-    background-color: #212b40; /* Matches input background */
-    color: white; /* Matches input text color */
-}
-
-    /* Modal Fade-In Animation */
     @keyframes fadeIn {
         from {
             opacity: 0;
-            transform: translateY(-10%);
+            transform: translateY(-20px);
         }
         to {
             opacity: 1;
@@ -170,99 +156,57 @@
     }
 </style>
 
-<div id="sitInModal" class="modal">
+<!-- ✅ MODAL HTML OUTPUT -->
+<div class="modal" id="sitInModal">
     <div class="modal-content">
         <div class="modal-header">
-            <h2>Sit In Form</h2>
-            <span class="close" id="closeModalBtn">&times;</span>
+            <h2>Sit-In Form</h2>
+            <span class="close" onclick="document.getElementById('sitInModal').remove();">&times;</span>
         </div>
+
         <div class="modal-body">
-        <form id="sitInForm" action="../includes/sit-in-process.php" method="POST">
+            <form action="sit-in-process.php" method="POST">
+                <input type="hidden" name="id_no" value="<?= $id ?>">
+                <input type="hidden" name="name" value="<?= $name ?>">
 
-    <div>
-        <label for="idNumber">ID Number:</label>
-        <input type="text" id="idNumber" name="idNumber" placeholder="Enter ID Number" required>
+                <label>ID No:</label>
+                <input type="text" value="<?= $id ?>" readonly>
+
+                <label>Name:</label>
+                <input type="text" value="<?= $name ?>" readonly>
+
+                <label>Course | Year:</label>
+                <input type="text" value="<?= $course ?> | <?= $year ?>" readonly>
+
+                <label>Remaining Sessions:</label>
+                <input type="text" value="<?= $remaining ?>" readonly>
+
+                <label for="purpose">Purpose:</label>
+                <select name="purpose" required>
+                    <option value="" disabled selected hidden>Select Purpose</option>
+                    <option value="ASP.Net Programming">ASP.Net Programming</option>
+                    <option value="C Programming">C Programming</option>
+                    <option value="C# Programming">C# Programming</option>
+                    <option value="Java Programming">Java Programming</option>
+                    <option value="PHP Programming">PHP Programming</option>
+                </select>
+
+                <label for="lab_number">Lab Number:</label>
+                <select name="lab_number" required>
+                    <option value="" disabled selected hidden>Select Lab</option>
+                    <option value="524">524</option>
+                    <option value="526">526</option>
+                    <option value="528">528</option>
+                    <option value="530">530</option>
+                    <option value="540">540</option>
+                    <option value="Mac Laboratory">Mac Laboratory</option>
+                </select>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn-close" onclick="document.getElementById('sitInModal').remove();">Cancel</button>
+                    <button type="submit" class="btn-sit-in">Submit Sit-In</button>
+                </div>
+            </form>
+        </div>
     </div>
-    <div>
-        <label for="studentName">Student Name:</label>
-        <input type="text" id="studentName" name="studentName" placeholder="Enter Student Name" required>
-    </div>
-    <div>
-    <label for="purpose">Purpose:</label>
-    <select id="purpose" name="purpose" required>
-        <option value="" disabled selected hidden>Select Purpose</option>
-        <option value="ASP.Net Programming">ASP.Net Programming</option>
-        <option value="C Programming">C Programming</option>
-        <option value="C# Programming">C# Programming</option>
-        <option value="Java Programming">Java Programming</option>
-        <option value="PHP Programming">PHP Programming</option>
-    </select>
 </div>
-<div>
-    <label for="lab">Laboratory Number:</label>
-    <select id="lab" name="lab" required>
-        <option value="" disabled selected hidden>Select Lab Number</option> <!-- Hidden as a choice -->
-        <option value="524">524</option>
-        <option value="526">526</option>
-        <option value="528">528</option>
-        <option value="530">530</option>
-        <option value="540">540</option>
-        <option value="Mac Laboratory">Mac Laboratory</option>
-    </select>
-</div>
-
-
-    <div>
-        <label for="remainingSession">Remaining Session:</label>
-        <input type="number" id="remainingSession" name="remainingSession" value="30" readonly>
-    </div>
-    <div class="modal-footer">
-        <button type="button" class="btn-close" id="closeModalBtnFooter">Cancel</button>
-        <button type="submit" class="btn-sit-in">Sit In</button>
-    </div>
-</form>
-
-</div>
-
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-    var modal = document.getElementById("sitInModal");
-    var btn = document.getElementById("openModalBtn");
-    var span = document.getElementById("closeModalBtn");
-    var footerBtn = document.getElementById("closeModalBtnFooter");
-
-    // Ensure the modal is hidden initially
-    if (modal) {
-        modal.style.display = "none";
-    }
-
-    // Check if button exists before adding event listener
-    if (btn) {
-        btn.addEventListener("click", function () {
-            modal.style.display = "block";
-        });
-    }
-
-    // Close modal when clicking the close button (X)
-    if (span) {
-        span.addEventListener("click", function () {
-            modal.style.display = "none";
-        });
-    }
-
-    // Close modal when clicking the cancel button
-    if (footerBtn) {
-        footerBtn.addEventListener("click", function () {
-            modal.style.display = "none";
-        });
-    }
-
-    // Close modal when clicking outside of the modal content
-    window.addEventListener("click", function (event) {
-        if (event.target === modal) {
-            modal.style.display = "none";
-        }
-    });
-});
-
-</script>

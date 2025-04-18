@@ -4,17 +4,86 @@ include '../includes/db-connection.php';
 
 $sit_in_rows = '';
 
-$success_message = isset($_SESSION['success_message']) ? $_SESSION['success_message'] : '';
-unset($_SESSION['success_message']);
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id_no'])) {
+    $id_no = $_POST['id_no'];
+    $name = $_POST['name'];
+    $purpose = $_POST['purpose'];
+    $lab_number = $_POST['lab_number'];
+    $remaining_sessions = (int)$_POST['remaining_sessions'];
 
-$sql = "SELECT id, 
-               id_no, 
-               name, 
-               purpose, 
-               lab_number, 
-               remaining_sessions  
-        FROM sit_in_records 
-        ORDER BY id ASC"; 
+    $check_stmt = $conn->prepare("SELECT id FROM sit_in_records WHERE id_no = ? AND status = 'Active'");
+    $check_stmt->bind_param("s", $id_no);
+    $check_stmt->execute();
+    $check_stmt->store_result();
+
+    if ($check_stmt->num_rows > 0) {
+        $_SESSION['notification_message'] = "Sit-In failed: Student already has an active record.";
+        $_SESSION['notification_type'] = "error";
+        header("Location: admin-current.php");
+        exit();
+    }
+
+    if ($remaining_sessions <= 0) {
+        $_SESSION['notification_message'] = "Sit-In failed: No remaining sessions.";
+        $_SESSION['notification_type'] = "error";
+        header("Location: admin-current.php");
+        exit();
+    }
+
+    $conn->begin_transaction();
+
+    try {
+        $stmt = $conn->prepare("INSERT INTO sit_in_records (id_no, name, purpose, lab_number, remaining_sessions, status, time_in) VALUES (?, ?, ?, ?, ?, 'Active', NOW())");
+        $stmt->bind_param("ssssi", $id_no, $name, $purpose, $lab_number, $remaining_sessions);
+        $stmt->execute();
+
+        $new_remaining = $remaining_sessions - 1;
+        $stmt2 = $conn->prepare("UPDATE users SET remaining_sessions = ? WHERE id_no = ?");
+        $stmt2->bind_param("is", $new_remaining, $id_no);
+        $stmt2->execute();
+
+        $conn->commit();
+        $_SESSION['notification_message'] = "Sit-In successfully recorded for $name!";
+        $_SESSION['notification_type'] = "success";
+    } catch (Exception $e) {
+        $conn->rollback();
+        $_SESSION['notification_message'] = "Sit-In failed: " . $e->getMessage();
+        $_SESSION['notification_type'] = "error";
+    }
+
+    header("Location: admin-current.php");
+    exit();
+}
+
+if (isset($_POST['time_out'])) {
+    $sit_in_id = $_POST['sit_in_id'];
+    $time_out = date("Y-m-d H:i:s");
+
+    $sql = "UPDATE sit_in_records SET status = 'Offline', time_out = ? WHERE id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("si", $time_out, $sit_in_id);
+
+    if ($stmt->execute()) {
+        $_SESSION['notification_message'] = "Student successfully timed out!";
+        $_SESSION['notification_type'] = "success";
+    } else {
+        $_SESSION['notification_message'] = "Error while timing out the student.";
+        $_SESSION['notification_type'] = "error";
+    }
+
+    header("Location: admin-current.php");
+    exit();
+}
+
+$notification_message = $_SESSION['notification_message'] ?? '';
+$notification_type = $_SESSION['notification_type'] ?? '';
+unset($_SESSION['notification_message'], $_SESSION['notification_type']);
+
+$sql = "SELECT r.id, r.id_no, r.name, r.purpose, r.lab_number, r.time_in, r.time_out, r.status, u.remaining_sessions
+        FROM sit_in_records r
+        JOIN users u ON r.id_no = u.id_no
+        WHERE r.status = 'Active'
+        ORDER BY r.id DESC";
 
 $result = $conn->query($sql);
 
@@ -26,9 +95,13 @@ if ($result && $result->num_rows > 0) {
         $purpose = htmlspecialchars($row['purpose']);
         $lab_number = htmlspecialchars($row['lab_number']);
         $remaining_sessions = htmlspecialchars($row['remaining_sessions']);
+        $time_in = htmlspecialchars($row['time_in']);
+        $time_out = htmlspecialchars($row['time_out'] ?? '—');
+        $status = htmlspecialchars($row['status']);
 
-        // Determine status based on remaining sessions
-        $status = ($remaining_sessions > 0) ? "Active" : "Inactive";
+        if ($time_out !== '—') {
+            $time_out = date('Y-m-d H:i:s', strtotime($time_out));
+        }
 
         $sit_in_rows .= "
         <tr id='row_$sit_in_id'>
@@ -38,288 +111,228 @@ if ($result && $result->num_rows > 0) {
             <td>$purpose</td>
             <td>$lab_number</td>
             <td>$remaining_sessions</td>
-            <td class='status'>$status</td>
+            <td>$status</td>
             <td>
-                <button class='logout-btn' data-id='$sit_in_id'>Log-out</button>
+                <form method='POST' action='admin-current.php'>
+                    <input type='hidden' name='sit_in_id' value='$sit_in_id'>
+                    <button type='submit' name='time_out' class='logout-btn'>Time Out</button>
+                </form>
             </td>
         </tr>";
     }
 } else {
-    $sit_in_rows = "<tr><td colspan='8'>No active sit-ins found.</td></tr>";
+    $sit_in_rows = "<tr><td colspan='10'>No active sit-in records found.</td></tr>";
 }
 
 $conn->close();
 ?>
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin - Current Sit-In</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <style>
-        body {
-            margin: 0;
-            font-family: 'Inter', sans-serif;
-            display: flex;
-            background-color: #0d121e;
-            color: #ffffff;
-        }
-        .main-content {
-            margin-left: 80px;
-            padding: 20px;
-            transition: margin-left 0.3s;
-            flex: 1;
-        }
-        
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px;
-            border-bottom: 2px solid #333;
-        }
-
-        .sidebar:hover ~ .main-content {
+  <meta charset="UTF-8" />
+  <title>Admin - Current Sit-In</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"/>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      display: flex;
+      background-color: #0d121e;
+      color: #ffffff;
+    }
+    .main-content {
+      margin-left: 80px;
+      padding: 20px;
+      flex: 1;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px;
+      border-bottom: 2px solid #333;
+    }
+    .sidebar:hover ~ .main-content {
             margin-left: 180px;
         }
+    .table-container {
+      margin-top: 20px;
+      border-radius: 10px;
+      padding: 20px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    table th, table td {
+      padding: 15px;
+      text-align: center;
 
-        .table-container {
-            margin-top: 20px;
-            border-radius: 10px;
-            padding: 20px;
-        }
+    }
+    thead tr {
+  background-color: transparent !important;
+}
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        table th, table td {
-            padding: 15px;
+    table td {
             text-align: center;
         }
-        table td {
-            text-align: center;
-        }
-
-        table th {
-            background-color: #0d121e;
-            cursor: pointer;
-        }
-
-        table tr:nth-child(even) {
-            background-color: #111524;
-        }
-
-        table tr:nth-child(odd) {
-            background-color: #212b40;
-        }
-
-        table tr:hover {
-            background-color: #181a25;
-        }
-
-        .logout-btn {
-            background-color: white;
-            color: #333;
-            border: none;
-            padding: 10px;
-            cursor: pointer;
-            border-radius: 20px;
-            font-weight: bold;
-            position: relative;
-            z-index: 2;
-        }
-
-        .logout-btn:hover {
-            background-color: whitesmoke;
-        }
-
-        td:last-child {
+    table tr:nth-child(even) {
+      background-color: #111524;
+    }
+    table tr:nth-child(odd) {
+      background-color: #212b40;
+    }
+    table tr:hover {
+      background-color: #181a25;
+    }
+    td:last-child {
             position: relative;
             text-align: center;
         }
 
-        .search-container {
-            display: flex;
-            align-items: center;
-            margin-bottom: 20px;
-            position: relative;
-        }
-
-        .search-container input {
-            padding: 10px 10px 10px 30px;
-            border: none;
-            border-radius: 20px;
-            width: 200px;
-            background-color: white;
-            color: black;
-        }
-
-        .search-container .search-icon {
-            position: absolute;
-            left: 10px;
-            color: black;
-        }
-
-        .sortable {
-            display: flex;
-            align-items: center;
-        }
-
-        .sort-arrow {
-            margin-left: 5px;
-            transition: transform 0.3s;
-        }
-
-        .sort-arrow.asc {
-            transform: rotate(180deg);
-        }
-        
-        td:nth-child(1) { 
-            text-align: left;
-            padding-left: 70px;
-        }
-        .notification {
-            display: none;
-            position: fixed;
-            top: 20px; 
-            left: 50%;
-            transform: translateX(-50%); 
-            background-color: #181a25; 
-            color: white;
-            padding: 15px 25px;
-            border-radius: 20px;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
-            font-size: 15px;
-            z-index: 1000;
-            text-align: center;
-            opacity: 0;
-            transition: opacity 0.5s ease-in-out;
-            display: flex;
-            align-items: center;
-            gap: 10px; 
-        }
-
-        .notification.show {
-            display: flex;
-            opacity: 1;
-        }
-
-        .notification i {
-            font-size: 15px;
-            color: white;
-        }
-    </style>
+    .logout-btn {
+      background-color: white;
+      color: #333;
+      border: none;
+      padding: 10px;
+      cursor: pointer;
+      border-radius: 20px;
+      font-weight: bold;
+    }
+    .logout-btn:hover {
+      background-color: whitesmoke;
+    }
+    .notification {
+      display: none;
+      position: fixed;
+      top: 20px; 
+      left: 50%;
+      transform: translateX(-50%); 
+      background-color: #181a25; 
+      color: white;
+      padding: 15px 25px;
+      border-radius: 20px;
+      font-size: 15px;
+      z-index: 1000;
+      text-align: center;
+      opacity: 0;
+      transition: opacity 0.5s ease-in-out;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .notification.show {
+      display: flex;
+      opacity: 1;
+    }
+    .notification i {
+      font-size: 15px;
+    }
+    .notification.success i {
+      color: #4ade80;
+    }
+    .notification.error i {
+      color: #f87171;
+    }
+    .sort-arrow {
+      margin-left: 5px;
+      transition: transform 0.3s;
+    }
+    .sort-arrow.asc {
+      transform: rotate(180deg);
+    }
+    td:nth-child(1) {
+      text-align: left;
+      padding-left: 70px;
+    }
+  </style>
 </head>
 <body>
-    <?php include '../includes/admin-sidebar.php'; ?>
 
-    <div class="main-content">
-        <header>
-            <h1>Current Sit-In</h1>
-            <div class="search-container">
-                <i class="fas fa-search search-icon"></i>
-                <input type="text" id="searchInput" placeholder="Search">
-            </div>
-        </header>
+<?php include '../includes/admin-sidebar.php'; ?>
 
-        <div class="table-container">
-            <table>
-                <thead>
-                    <tr>
-                        <th class="sortable" id="sortSitInNumber" style="text-align: left;">
-                            Sit-In Number <span class="sort-arrow" id="sortIcon">▲</span>
-                        </th>
-                        <th>ID Number</th>
-                        <th>Name</th>
-                        <th>Purpose</th>
-                        <th>Lab Number</th>
-                        <th>Session</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="sitInTable">
-                    <?php echo $sit_in_rows; ?>
-                </tbody>
-            </table>
-        </div>
-    </div>
+<div class="main-content">
+  <header>
+    <h1>Current Sit-In</h1>
+  </header>
 
-    <div id="successNotification" class="notification">
-        <i class="fas fa-check-circle"></i> 
-        <span><?php echo $success_message; ?></span>
-    </div>
+  <div class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th class="sortable" id="sortSitInNumber" style="text-align: left;">
+            Sit-In Number <span class="sort-arrow" id="sortIcon">▲</span>
+          </th>
+          <th>ID Number</th>
+          <th>Name</th>
+          <th>Purpose</th>
+          <th>Lab Number</th>
+          <th>Session</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="sitInTable">
+        <?= $sit_in_rows ?>
+      </tbody>
+    </table>
+  </div>
+</div>
 
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            let ascending = true; 
+<!-- ✅ Dynamic Notification -->
+<div id="successNotification" class="notification <?= $notification_type ?>">
+  <i class="<?= $notification_type === 'success' ? 'fas fa-check-circle' : 'fas fa-times-circle' ?>"></i>
+  <span id="notificationMessage"><?= $notification_message ?></span>
+</div>
 
-        document.getElementById("sortSitInNumber").addEventListener("click", function() {
-            let table = document.getElementById("sitInTable");
-            let rows = Array.from(table.rows);
-            let sortIcon = document.getElementById("sortIcon");
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    // Sort by Sit-In #
+    let ascending = true;
+    document.getElementById("sortSitInNumber").addEventListener("click", function () {
+        const table = document.getElementById("sitInTable");
+        const rows = Array.from(table.rows);
+        const sortIcon = document.getElementById("sortIcon");
 
-            rows.sort((a, b) => {
-                let valA = parseInt(a.querySelector(".sit-in-id").textContent);
-                let valB = parseInt(b.querySelector(".sit-in-id").textContent);
-                return ascending ? valA - valB : valB - valA;
-            });
+        rows.sort((a, b) => {
+            const valA = parseInt(a.querySelector(".sit-in-id").textContent);
+            const valB = parseInt(b.querySelector(".sit-in-id").textContent);
+            return ascending ? valA - valB : valB - valA;
+        });
 
-        ascending = !ascending; 
+        ascending = !ascending;
         sortIcon.textContent = ascending ? "▲" : "▼";
         sortIcon.classList.toggle("asc", ascending);
 
         table.innerHTML = "";
         rows.forEach(row => table.appendChild(row));
     });
+
+    // Show Notification if Message Exists
+    const message = <?= json_encode($notification_message) ?>;
+    const type = <?= json_encode($notification_type) ?>;
+    if (message) {
+        showNotification(message, type);
+    }
 });
 
-    document.addEventListener("DOMContentLoaded", function () {
-        document.getElementById("sitInTable").addEventListener("click", function (event) {
-            if (event.target.classList.contains("logout-btn")) {
-                const sitInId = event.target.getAttribute("data-id");
+function showNotification(message, type) {
+    const box = document.getElementById("successNotification");
+    const icon = box.querySelector("i");
+    const text = document.getElementById("notificationMessage");
 
-                if (confirm("Do you want to log out this user?")) {
-                    fetch(`../includes/logout-student.php?id=${sitInId}`)
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.status === "success") {
-                                document.getElementById(`row_${sitInId}`).remove(); 
-                                showNotification(data.message); 
-                            } else {
-                                alert("Failed to log out: " + data.message);
-                            }
-                        })
-                        .catch(error => console.error("Error:", error));
-                }
-            }
-        });
-    });
+    box.className = `notification ${type} show`;
+    icon.className = type === "success" ? "fas fa-check-circle" : "fas fa-times-circle";
+    text.textContent = message;
 
-
-        function showNotification(message) {
-            const notification = document.getElementById("successNotification");
-            notification.innerHTML = `<i class="fas fa-check-circle"></i> ${message}`;
-            notification.classList.add("show");
-
-            setTimeout(() => {
-                notification.classList.remove("show");
-            }, 3000);
+    setTimeout(() => {
+        box.classList.remove("show");
+    }, 3000);
 }
+</script>
 
-        document.getElementById("searchInput").addEventListener("keyup", function() {
-            let filter = this.value.toUpperCase();
-            let rows = document.querySelectorAll("#sitInTable tr");
-            rows.forEach(row => {
-                let text = row.textContent || row.innerText;
-                row.style.display = text.toUpperCase().includes(filter) ? "" : "none";
-            });
-        });
-
-    </script>
 </body>
 </html>

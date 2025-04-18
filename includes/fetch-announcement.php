@@ -1,7 +1,6 @@
 <?php
 include 'db-connection.php';
 
-// Start session only if not already started
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
@@ -28,14 +27,10 @@ $result = $conn->query($sql);
 if ($result->num_rows > 0) {
     while ($row = $result->fetch_assoc()) {
         echo "<div class='announcement-item' id='announcement-".$row['id']."'>";
-        
-        // Delete Button in Upper Right
         echo "<button class='delete-btn' onclick='deleteAnnouncement(".$row['id'].")'><i class='fas fa-trash'></i></button>";
-
         echo "<p><strong>" . htmlspecialchars($row['created_by']) . "</strong> posted:</p>";
         echo "<p>" . nl2br(htmlspecialchars($row['announcement_text'])) . "</p>";
         echo "<small>📅 " . $row['created_at'] . "</small>";
-
         echo "</div>";
     }
 } else {
@@ -66,13 +61,6 @@ function deleteAnnouncement(id) {
 </script>
 
 <style>
-.announcement-item {
-    position: relative;
-    background-color: #212b40;
-    padding: 15px;
-    border-radius: 5px;
-    margin-bottom: 15px;
-}
 
 .delete-btn {
     position: absolute;
@@ -80,12 +68,8 @@ function deleteAnnouncement(id) {
     right: 10px;
     background: none;
     border: none;
-    color: #007BFF;
+    color: whitesmoke;
     font-size: 15px;
     cursor: pointer;
-}
-
-.delete-btn:hover {
-    color: #0056b3;
 }
 </style>

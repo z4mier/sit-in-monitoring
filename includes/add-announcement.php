@@ -14,10 +14,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             VALUES ('$announcement_text', '$admin_name')";
 
     if ($conn->query($sql) === TRUE) {
-        header("Location: ../admin/admin-announcements.php"); // Redirects to the announcements page
+        header("Location: ../admin/admin-announcements.php"); 
         exit(); 
     } else {
-        echo "❌ Error: " . $conn->error;
+        echo "Error!: " . $conn->error;
     }
 }
 

@@ -45,6 +45,7 @@ if ($result && $result->num_rows > 0) {
 $conn->close();
 ?>
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -66,7 +67,6 @@ $conn->close();
             transition: margin-left 0.3s;
             flex: 1;
         }
-
         .sidebar:hover ~ .main-content {
             margin-left: 180px;
         }
@@ -307,157 +307,130 @@ $conn->close();
             </table>
         </div>
     </div>
-
-    <!-- Edit Student Modal -->
-    <div id="editStudentModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>Edit Student</h2>
-                <span class="close" onclick="closeEditModal()">&times;</span>
-            </div>
-
-            <div class="modal-body">
-                <form id="editStudentForm">
-                    <!-- Old Student ID -->
-                    <input type="hidden" name="old_id" id="oldStudentId">
-
-                    <!-- Student ID -->
-                    <label for="editStudentId">ID Number:</label>
-                    <input type="text" name="id" id="editStudentId" required>
-
-                    <label for="editStudentName">Name:</label>
-                    <input type="text" name="name" id="editStudentName" required>
-
-                    <label for="editYrLevel">Year Level:</label>
-                    <select id="editYrLevel" name="yr_level">
-                        <option value="1">1</option>
-                        <option value="2">2</option>
-                        <option value="3">3</option>
-                        <option value="4">4</option>
-                    </select>
-
-                    <label for="editCourse">Course:</label>
-                    <select id="editCourse" name="course">
-                        <option value="BSIT">BSIT</option>
-                        <option value="BSCS">BSCS</option>
-                        <option value="BSCpE">BSCpE</option>
-                        <option value="BSED">BSED</option>
-                        <option value="BSHM">BSHM</option>
-                    </select>
-
-                    <label for="editSessions">Remaining Sessions:</label>
-                    <input type="number" name="remaining_sessions" id="editSessions" value="30" readonly>
-
-                    <div class="modal-footer">
-                        <button type="button" onclick="closeEditModal()">Cancel</button>
-                        <button type="submit">Update</button>
-                    </div>
-                </form>
-            </div>
-        </div>
+        <!-- Edit Student Modal -->
+<div id="editStudentModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>Edit Student</h2>
+      <span class="close" onclick="closeEditModal()">&times;</span>
     </div>
-    <!-- Sit-in Form -->
-    <?php include '../includes/sit-in-form.php'; ?>
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            var editModal = document.getElementById("editStudentModal");
-            if (editModal) {
-                editModal.style.display = "none";
-            }
 
-            // Search Bar
-            document.getElementById("searchInput").addEventListener("keyup", function () {
-                let filter = this.value.toUpperCase();
-                let rows = document.querySelectorAll("#studentTable tr");
+    <div class="modal-body">
+      <form id="editStudentForm">
+        <input type="hidden" name="old_id" id="oldStudentId">
 
-                rows.forEach(row => {
-                    let text = row.textContent || row.innerText;
-                    row.style.display = text.toUpperCase().includes(filter) ? "" : "none";
-                });
-            });
-        });
+        <label for="editStudentId">ID Number:</label>
+        <input type="text" name="id" id="editStudentId" required>
 
-         // Open Sit-In Form
-         document.getElementById("openModalBtn").addEventListener("click", function() {
-            document.getElementById("sitInModal").style.display = "block";
-        });
+        <label for="editStudentName">Name:</label>
+        <input type="text" name="name" id="editStudentName" required>
 
-        document.addEventListener("DOMContentLoaded", function () {
-        console.log("DOM fully loaded!");
+        <label for="editYrLevel">Year Level:</label>
+        <select id="editYrLevel" name="yr_level">
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+        </select>
 
-        let sitInForm = document.getElementById("sitInForm");
-        
-        if (sitInForm) {
-            sitInForm.addEventListener("submit", function () {
-                console.log("Form is being submitted!");
-            });
-        } else {
-            console.log("sitInForm not found!");
-        }
+        <label for="editCourse">Course:</label>
+        <select id="editCourse" name="course">
+          <option value="BSIT">BSIT</option>
+          <option value="BSCS">BSCS</option>
+          <option value="BSCpE">BSCpE</option>
+          <option value="BSED">BSED</option>
+          <option value="BSHM">BSHM</option>
+        </select>
+
+        <label for="editSessions">Remaining Sessions:</label>
+        <input type="number" name="remaining_sessions" id="editSessions" value="30" readonly>
+
+        <div class="modal-footer">
+          <button type="button" onclick="closeEditModal()">Cancel</button>
+          <button type="submit">Update</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const modal = document.getElementById("editStudentModal");
+
+    if (modal) modal.style.display = "none";
+
+    // 🔎 Search Filtering
+    document.getElementById("searchInput").addEventListener("keyup", function () {
+      const filter = this.value.toUpperCase();
+      const rows = document.querySelectorAll("#studentTable tr");
+
+      rows.forEach(row => {
+        const text = row.textContent || row.innerText;
+        row.style.display = text.toUpperCase().includes(filter) ? "" : "none";
+      });
     });
+  });
 
-        document.getElementById("editStudentForm").addEventListener("submit", function (e) {
-            e.preventDefault(); 
+  function openEditModal(id, name, yrLevel, course, remainingSessions) {
+    document.getElementById("oldStudentId").value = id;
+    document.getElementById("editStudentId").value = id;
+    document.getElementById("editStudentName").value = name;
+    document.getElementById("editYrLevel").value = yrLevel;
+    document.getElementById("editCourse").value = course;
+    document.getElementById("editSessions").value = remainingSessions;
 
-            let formData = new FormData(this);
+    document.getElementById("editStudentModal").style.display = "flex";
+  }
 
-            fetch("../includes/update-student.php", {
-                method: "POST",
-                body: formData
-            })
-            .then(response => response.text())
-            .then(data => {
-                if (data.includes("Error")) {
-                    alert("Failed to update: " + data);
-                } else {
-                    alert("Update successful!");
-                    closeEditModal();
+  function closeEditModal() {
+    document.getElementById("editStudentModal").style.display = "none";
+  }
 
-                    let oldStudentId = document.getElementById("oldStudentId").value;
-                    let studentId = document.getElementById("editStudentId").value;
-                    let studentName = document.getElementById("editStudentName").value;
-                    let yrLevel = document.getElementById("editYrLevel").value;
-                    let course = document.getElementById("editCourse").value;
-                    let remainingSessions = document.getElementById("editSessions").value;
+  function confirmDelete(studentId) {
+    if (confirm(`Are you sure you want to delete Student ID: ${studentId}?`)) {
+      window.location.href = `../includes/delete-student.php?id=${studentId}`;
+    }
+  }
 
-                    let tableRows = document.querySelectorAll("#studentTable tr");
-                    tableRows.forEach(row => {
-                        if (row.cells[0].innerText === oldStudentId) {
-                            row.cells[0].innerText = studentId;
-                            row.cells[1].innerText = studentName;
-                            row.cells[2].innerText = yrLevel;
-                            row.cells[3].innerText = course;
-                            row.cells[4].innerText = remainingSessions;
-                        }
-                    });
-                }
-            })
-            .catch(error => console.error("Error:", error));
+  document.getElementById("editStudentForm").addEventListener("submit", function (e) {
+    e.preventDefault();
+
+    const formData = new FormData(this);
+
+    fetch("../includes/update-student.php", {
+      method: "POST",
+      body: formData
+    })
+    .then(response => response.text())
+    .then(data => {
+      if (data.includes("Error")) {
+        alert("Failed to update: " + data);
+      } else {
+        alert("Update successful!");
+        closeEditModal();
+
+        const oldStudentId = document.getElementById("oldStudentId").value;
+        const studentId = document.getElementById("editStudentId").value;
+        const studentName = document.getElementById("editStudentName").value;
+        const yrLevel = document.getElementById("editYrLevel").value;
+        const course = document.getElementById("editCourse").value;
+        const remainingSessions = document.getElementById("editSessions").value;
+
+        const tableRows = document.querySelectorAll("#studentTable tr");
+        tableRows.forEach(row => {
+          if (row.cells[0].innerText === oldStudentId) {
+            row.cells[0].innerText = studentId;
+            row.cells[1].innerText = studentName;
+            row.cells[2].innerText = yrLevel;
+            row.cells[3].innerText = course;
+            row.cells[4].innerText = remainingSessions;
+          }
         });
-
-        function openEditModal(id, name, yrLevel, course, remainingSessions) {
-            console.log("Opening edit modal for:", id, name, yrLevel, course, remainingSessions); // Debugging
-
-            document.getElementById("oldStudentId").value = id;
-            document.getElementById("editStudentId").value = id;
-            document.getElementById("editStudentName").value = name;
-            document.getElementById("editYrLevel").value = yrLevel;
-            document.getElementById("editCourse").value = course;
-            document.getElementById("editSessions").value = remainingSessions;
-
-            document.getElementById("editStudentModal").style.display = "block";
-        }
-
-        function closeEditModal() {
-            document.getElementById("editStudentModal").style.display = "none";
-        }
-
-        function confirmDelete(studentId) {
-            if (confirm(`Are you sure you want to delete Student ID: ${studentId}?`)) {
-                window.location.href = `../includes/delete-student.php?id=${studentId}`;
-            }
-        }
-    </script>
+      }
+    })
+    .catch(error => console.error("Error:", error));
+  });
+</script>
 
 </body>
 </html>

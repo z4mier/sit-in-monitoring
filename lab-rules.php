@@ -12,11 +12,6 @@
             margin: 0;
             padding: 0;
         }
-        .header {
-            color: white;
-            padding: 20px 20px;
-            text-align: center;
-        }
         .logos {
             display: flex;
             justify-content: center;
@@ -57,10 +52,6 @@
     </style>
 </head>
 <body>
-    <div class="header">
-        <!-- Logos Section -->
-        <h1>CCS Sit-In Monitoring System</h1>
-    </div>
     <?php include 'includes/sidebar.php'; ?>
     <div class="container">
         <!-- Lab Rules Card -->
@@ -69,7 +60,7 @@
                 <img src="assets/uc.png" alt="UC Logo">
                 <img src="assets/ccs.png" alt="CCS Logo">
             </div>
-            <h3>LAB RULES</h3>
+            <h3>LAB RULES & REGULATIONS</h3>
             <p>To avoid embarrassment and maintain camaraderie with your friends and superiors at our laboratories, please observe the following:</p>
             <ul>
                 <li>Maintain silence, proper decorum, and discipline inside the laboratory. Mobile phones, walkmans, and other personal equipment must be switched off.</li>

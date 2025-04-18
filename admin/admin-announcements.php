@@ -21,24 +21,6 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
             background-color: #0d121e;
             color: #ffffff;
         }
-
-        /* Sidebar */
-        .sidebar {
-            width: 80px;
-            height: 100vh;
-            background-color: #111524;
-            position: fixed;
-            top: 0;
-            left: 0;
-            transition: width 0.3s ease-in-out;
-            overflow: hidden;
-        }
-
-        .sidebar:hover {
-            width: 200px;
-        }
-
-        /* Main Content */
         .main-content {
             margin-left: 80px;
             padding: 20px;
@@ -50,8 +32,6 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
             margin-left: 200px;
             width: calc(100% - 200px);
         }
-
-        /* Header */
         header {
             display: flex;
             justify-content: space-between;
@@ -59,40 +39,33 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
             padding: 20px;
             border-bottom: 2px solid #333;
         }
-
-        /* Container for Form & Announcements */
         .content-wrapper {
             display: flex;
             gap: 20px;
             align-items: flex-start;
             margin-top: 20px;
         }
-
-        /* Uniform Box Styling */
         .box {
-    flex: 1;
-    padding: 20px;
-    border-radius: 10px;
-    min-height: 350px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-}
-
+            flex: 1;
+            padding: 20px;
+            border-radius: 10px;
+            min-height: 350px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
         .box-title {
             font-size: 18px;
             font-weight: bold;
             margin-bottom: 15px;
             text-align: center;
-            border-bottom: 2px solid #007BFF;
+            border-bottom: 2px solid white;
             padding-bottom: 10px;
         }
-
-        /* Form Styling */
         .announcement-form textarea {
             width: 96%;
             height: 200px;
             padding: 15px;
             border: none;
-            border-radius: 8px;
+            border-radius: 5px;
             font-size: 16px;
             background-color: #212b40;
             color: white;
@@ -107,30 +80,26 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
 
         .announcement-form button {
             padding: 10px 20px;
-            background-color: #007BFF;
-            color: white;
+            background-color: white;
+            color: #0d121e;
             border: none;
-            border-radius: 5px;
+            border-radius: 20px;
             cursor: pointer;
             font-size: 14px;
         }
-
-        /* Announcements List */
         .announcements-container {
-    max-height: 350px;
-    overflow-y: auto;
-    padding: 20px;
-    border-radius: 10px;
-}
-
-
-        .announcement-item {
-            margin-bottom: 15px;
-            padding: 15px;
-            background-color: #212b40;
-            border-radius: 5px;
+            max-height: 350px;
+            overflow-y: auto;
+            padding: 20px;
+            border-radius: 10px;
         }
-
+        .announcement-item {
+            position: relative;
+            background-color: #212b40;
+            padding: 15px;
+            border-radius: 2px;
+            margin-bottom: 15px;
+        }
         .announcement-item small {
             display: block;
             margin-top: 5px;
@@ -141,10 +110,8 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
     </style>
 </head>
 <body>
-
-    <div class="sidebar">
+        <!-- Sidebar -->
         <?php include '../includes/admin-sidebar.php'; ?>
-    </div>
 
     <div class="main-content">
         <header>
