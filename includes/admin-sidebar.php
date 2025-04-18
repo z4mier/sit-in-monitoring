@@ -125,19 +125,26 @@
 </head>
 <body>
 
-  <!--  SIDEBAR -->
-  <div class="sidebar">
-    <div class="sidebar-links">
-      <a href="admin-home.php"><i class="fas fa-home"></i><span>Home</span></a>
-      <a href="#" onclick="openModal()"><i class="fas fa-search"></i><span>Search</span></a>
-      <a href="admin-students.php"><i class="fas fa-users"></i><span>Students</span></a>
-      <a href="admin-announcements.php"><i class="fas fa-bullhorn"></i><span>Announcement</span></a>
-      <a href="admin-current.php"><i class="fas fa-calendar-check"></i><span>Current Sit-In</span></a>
-      <a href="admin-records.php"><i class="fas fa-folder"></i><span>Records</span></a>
-    </div>
-    <div class="sidebar-logout" style="margin-top: 450px; padding-left: 5px; margin-bottom: auto;">
-  <a href="../includes/logout.php"><i class="fas fa-sign-out-alt"></i><span>Logout</span></a>
+  <!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="sidebar-links">
+    <a href="admin-home.php"><i class="fas fa-home"></i><span>Home</span></a>
+    <a href="#" onclick="openModal()"><i class="fas fa-search"></i><span>Search</span></a>
+    <a href="admin-students.php"><i class="fas fa-users"></i><span>Students</span></a>
+    <a href="admin-announcements.php"><i class="fas fa-bullhorn"></i><span>Announcement</span></a>
+    <a href="admin-current.php"><i class="fas fa-calendar-check"></i><span>Current Sit-In</span></a>
+    <a href="admin-records.php"><i class="fas fa-folder"></i><span>Sit-In Records</span></a>
+    <a href="admin-reports.php"><i class="fas fa-file-alt"></i><span>Sit-In Reports</span></a>
+    <a href="admin-feedback.php"><i class="fas fa-comment-dots"></i><span>Feedback Reports</span></a>
+    <a href="admin-reservations.php"><i class="fas fa-calendar-alt"></i><span>Reservations</span></a>
+    <a href="admin-leaderboard.php"><i class="fas fa-trophy"></i><span>Leaderboard</span></a>
+  </div>
+
+  <div class="sidebar-logout" style="margin-top: 290px; padding-left: 5px; margin-bottom: auto;">
+    <a href="../includes/logout.php"><i class="fas fa-sign-out-alt"></i><span>Logout</span></a>
+  </div>
 </div>
+
 
   </div>
 

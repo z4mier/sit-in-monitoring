@@ -7,15 +7,17 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
     exit();
 }
 
-// Fetch the total number of registered students
-$sql_users = "SELECT COUNT(*) as total_users FROM users";
+// Fetch the total number of registered students (excluding admin)
+$sql_users = "SELECT COUNT(*) as total_users FROM users WHERE role != 'admin' OR role IS NULL";
 $result_users = $conn->query($sql_users);
 $total_users = ($result_users->num_rows > 0) ? $result_users->fetch_assoc()['total_users'] : 0;
 
-// Fetch the current sit-ins (students with no end_time)
-$sql_current_sitin = "SELECT COUNT(*) as current_sitin FROM sit_in_records";
+
+// Fetch the number of currently active students
+$sql_current_sitin = "SELECT COUNT(*) as current_sitin FROM sit_in_records WHERE status = 'Active'";
 $result_current_sitin = $conn->query($sql_current_sitin);
 $current_sitin = ($result_current_sitin->num_rows > 0) ? $result_current_sitin->fetch_assoc()['current_sitin'] : 0;
+
 
 // Fetch total sit-ins ever recorded
 $sql_total_sitin = "SELECT COUNT(*) as total_sitin FROM sit_in_records";
@@ -97,7 +99,9 @@ $conn->close();
         .card-header {
             display: flex;
             align-items: center;
-            gap: 5px;
+            justify-content: center;
+            gap: 8px;
+            text-align: center;
         }
 
         .card-header i {

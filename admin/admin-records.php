@@ -10,7 +10,7 @@ unset($_SESSION['notification_message'], $_SESSION['notification_type']);
 $sort_column = $_GET['sort'] ?? 'id';
 $sort_order = $_GET['order'] ?? 'DESC';
 
-$allowed_columns = ['id', 'id_no', 'name', 'purpose', 'lab_number', 'time_in', 'time_out', 'date'];
+$allowed_columns = ['id', 'id_no', 'name', 'purpose', 'lab_number', 'time_in', 'time_out', 'date', 'points'];
 $allowed_orders = ['ASC', 'DESC'];
 
 if (!in_array($sort_column, $allowed_columns)) $sort_column = 'time_in';
@@ -28,7 +28,7 @@ if ($start_date && $end_date) {
     $date_filter = " WHERE date <= '$end_date'";
 }
 
-$sql = "SELECT r.id, r.id_no, r.name, r.purpose, r.lab_number, r.time_in, r.time_out, r.date
+$sql = "SELECT r.id, r.id_no, r.name, r.purpose, r.lab_number, r.time_in, r.time_out, r.date, r.points
         FROM sit_in_records r
         $date_filter
         ORDER BY $sort_column $sort_order";
@@ -37,6 +37,7 @@ $result = $conn->query($sql);
 
 if ($result && $result->num_rows > 0) {
     while ($row = $result->fetch_assoc()) {
+        $id = htmlspecialchars($row['id']);
         $id_no = htmlspecialchars($row['id_no']);
         $name = htmlspecialchars($row['name']);
         $purpose = htmlspecialchars($row['purpose']);
@@ -44,6 +45,7 @@ if ($result && $result->num_rows > 0) {
         $time_in = $row['time_in'] ? date('H:i:s', strtotime($row['time_in'])) : '—';
         $time_out = $row['time_out'] ? date('H:i:s', strtotime($row['time_out'])) : '—';
         $date = htmlspecialchars($row['date']);
+        $points = htmlspecialchars($row['points'] ?? 0);
 
         $sit_in_rows .= "
         <tr>
@@ -54,14 +56,32 @@ if ($result && $result->num_rows > 0) {
             <td>$time_in</td>
             <td>$time_out</td>
             <td>$date</td>
+            <td>
+                <form method='POST' action='../includes/assign-points.php' style='display: flex; justify-content: center; align-items: center; gap: 6px;'>
+                    <input type='hidden' name='sit_in_id' value='$id'>
+                    <input 
+                        type='number' 
+                        name='points' 
+                        min='0' 
+                        max='1' 
+                        oninput='this.value = Math.max(0, Math.min(1, this.value));'
+                        style='width: 50px; padding: 6px; text-align: center; font-size: 14px;' 
+                    />
+                    <button type='submit' style='border: none; background-color: white; color: #111524; border-radius: 5px; padding: 6px 10px; cursor: pointer;' title='Add Point'>
+                        <i class='fas fa-plus'></i>
+                    </button>
+                </form>
+            </td>
         </tr>";
+
     }
 } else {
-    $sit_in_rows = "<tr><td colspan='7'>No sit-in records found.</td></tr>";
+    $sit_in_rows = "<tr><td colspan='8'>No sit-in records found.</td></tr>";
 }
 
 $conn->close();
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -164,15 +184,17 @@ $conn->close();
     <div class="table-container">
         <table>
             <thead>
-                <tr>
-                    <th class="sortable" data-column="id_no">ID Number <span class="sort-arrow <?= $sort_column === 'id_no' ? ($sort_order === 'ASC' ? 'asc' : '') : '' ?>"></span></th>
-                    <th class="sortable" data-column="name">Name <span class="sort-arrow <?= $sort_column === 'name' ? ($sort_order === 'ASC' ? 'asc' : '') : '' ?>"></span></th>
-                    <th class="sortable" data-column="purpose">Purpose <span class="sort-arrow <?= $sort_column === 'purpose' ? ($sort_order === 'ASC' ? 'asc' : '') : '' ?>"></span></th>
-                    <th class="sortable" data-column="lab_number">Lab # <span class="sort-arrow <?= $sort_column === 'lab_number' ? ($sort_order === 'ASC' ? 'asc' : '') : '' ?>"></span></th>
-                    <th class="sortable" data-column="time_in">Time In <span class="sort-arrow <?= $sort_column === 'time_in' ? ($sort_order === 'ASC' ? 'asc' : '') : '' ?>"></span></th>
-                    <th class="sortable" data-column="time_out">Time Out <span class="sort-arrow <?= $sort_column === 'time_out' ? ($sort_order === 'ASC' ? 'asc' : '') : '' ?>"></span></th>
-                    <th class="sortable" data-column="date">Date <span class="sort-arrow <?= $sort_column === 'date' ? ($sort_order === 'ASC' ? 'asc' : '') : '' ?>"></span></th>
+            <tr>
+                <th class="sortable" data-column="id_no">ID Number <span class="sort-arrow <?= $sort_column === 'id_no' ? ($sort_order === 'ASC' ? 'asc' : '') : '' ?>"></span></th>
+                <th class="sortable" data-column="name">Name <span class="sort-arrow <?= $sort_column === 'name' ? ($sort_order === 'ASC' ? 'asc' : '') : '' ?>"></span></th>
+                <th class="sortable" data-column="purpose">Purpose <span class="sort-arrow <?= $sort_column === 'purpose' ? ($sort_order === 'ASC' ? 'asc' : '') : '' ?>"></span></th>
+                <th class="sortable" data-column="lab_number">Lab # <span class="sort-arrow <?= $sort_column === 'lab_number' ? ($sort_order === 'ASC' ? 'asc' : '') : '' ?>"></span></th>
+                <th class="sortable" data-column="time_in">Time In <span class="sort-arrow <?= $sort_column === 'time_in' ? ($sort_order === 'ASC' ? 'asc' : '') : '' ?>"></span></th>
+                <th class="sortable" data-column="time_out">Time Out <span class="sort-arrow <?= $sort_column === 'time_out' ? ($sort_order === 'ASC' ? 'asc' : '') : '' ?>"></span></th>
+                <th class="sortable" data-column="date">Date <span class="sort-arrow <?= $sort_column === 'date' ? ($sort_order === 'ASC' ? 'asc' : '') : '' ?>"></span></th>
+                <th class="sortable" data-column="points">Points <span class="sort-arrow <?= $sort_column === 'points' ? ($sort_order === 'ASC' ? 'asc' : '') : '' ?>"></span></th>
                 </tr>
+
             </thead>
             <tbody id="sitInTable">
                 <?= $sit_in_rows ?>
