@@ -76,6 +76,8 @@ $conn->close();
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"/>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+
   <style>
     body {
       margin: 0;
@@ -119,7 +121,7 @@ $conn->close();
       position: absolute;
       right: 15px;
       color: black;
-      pointer-events: none; /* Make icon non-interactive */
+      pointer-events: none;
     }
     .top-controls {
       display: flex;
@@ -265,22 +267,18 @@ $conn->close();
 </div>
 
 <script>
-// Auto-submit search when text is entered with debounce
 let searchTimeout;
 
 function handleSearchInput(input) {
   clearTimeout(searchTimeout);
-  
-  // Set a timeout to avoid excessive requests
   searchTimeout = setTimeout(() => {
     document.getElementById('searchForm').submit();
-  }, 500); // 500ms delay
+  }, 500); 
 }
 
-// Add event listener for enter key in search input
 document.getElementById('searchInput').addEventListener('keypress', function(e) {
   if (e.key === 'Enter') {
-    e.preventDefault(); // Prevent default form submission
+    e.preventDefault(); 
     document.getElementById('searchForm').submit();
   }
 });
@@ -290,24 +288,63 @@ function exportTable(type) {
   const rows = [...table.rows].map(row =>
     [...row.cells].map(cell => cell.innerText)
   );
+  const headers = ["ID Number", "Name", "Purpose", "Lab", "Time In", "Time Out", "Date"];
 
-  const wb = XLSX.utils.book_new();
-  const ws = XLSX.utils.aoa_to_sheet([["ID", "Name", "Purpose", "Lab", "Time In", "Time Out", "Date"], ...rows]);
-  XLSX.utils.book_append_sheet(wb, ws, "SitInRecords");
+  if (type === "csv" || type === "excel") {
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
+    XLSX.utils.book_append_sheet(wb, ws, "SitInRecords");
 
-  if (type === "csv") XLSX.writeFile(wb, "SitInRecords.csv");
-  else if (type === "excel") XLSX.writeFile(wb, "SitInRecords.xlsx");
-  else if (type === "pdf") {
+    if (type === "csv") {
+      XLSX.writeFile(wb, "SitInRecords.csv");
+    } else {
+      XLSX.writeFile(wb, "SitInRecords.xlsx");
+    }
+  } else if (type === "pdf") {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
-    doc.text("Sit-In Records", 10, 10);
-    rows.forEach((row, i) => {
-      doc.text(row.join(" | "), 10, 20 + i * 8);
-    });
-    doc.save("SitInRecords.pdf");
+
+    const ucImg = new Image();
+    ucImg.src = '../assets/uc.png';
+
+    const ccsImg = new Image();
+    ccsImg.src = '../assets/ccs.png';
+
+    const now = new Date();
+    const printedDate = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+
+    ucImg.onload = () => {
+      ccsImg.onload = () => {
+        doc.addImage(ucImg, 'PNG', 15, 10, 20, 20);
+        doc.addImage(ccsImg, 'PNG', 175, 10, 20, 20);
+
+        doc.setFontSize(12);
+        doc.setFont("helvetica", "bold");
+        doc.text("University of Cebu-Main Campus", 105, 15, { align: "center" });
+        doc.setFont("helvetica", "normal");
+        doc.text("College of Computer Studies", 105, 22, { align: "center" });
+        doc.text("CCS Sit-in Monitoring System Reports", 105, 29, { align: "center" });
+
+        doc.setFontSize(10);
+        doc.text(`Printed Date: ${printedDate}`, 15, 40);
+
+        doc.autoTable({
+          startY: 45,
+          head: [headers],
+          body: rows,
+          theme: "grid",
+          styles: { fontSize: 9 },
+          headStyles: { fillColor: [30, 30, 30], halign: "center" },
+          bodyStyles: { halign: "center" },
+        });
+
+        doc.save("SitInRecords.pdf");
+      };
+    };
   }
 }
 </script>
+
 
 </body>
 </html>
