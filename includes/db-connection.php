@@ -1,4 +1,6 @@
 <?php
+date_default_timezone_set('Asia/Manila');
+
 $servername = "localhost";  // Change if using a remote server
 $username = "root";         // Default XAMPP MySQL user
 $password = "";             // Default XAMPP has no password

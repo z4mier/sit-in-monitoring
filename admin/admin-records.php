@@ -2,29 +2,20 @@
 session_start();
 include '../includes/db-connection.php';
 
-// Fetch all sit-in records
 $sit_in_rows = '';
 $notification_message = $_SESSION['notification_message'] ?? '';
 $notification_type = $_SESSION['notification_type'] ?? '';
 unset($_SESSION['notification_message'], $_SESSION['notification_type']);
 
-// Sorting Parameters
-$sort_column = $_GET['sort'] ?? 'date';
+$sort_column = $_GET['sort'] ?? 'id';
 $sort_order = $_GET['order'] ?? 'DESC';
 
-// Validate sorting parameters to prevent SQL injection
 $allowed_columns = ['id', 'id_no', 'name', 'purpose', 'lab_number', 'time_in', 'time_out', 'date'];
 $allowed_orders = ['ASC', 'DESC'];
 
-if (!in_array($sort_column, $allowed_columns)) {
-    $sort_column = 'date'; // Default if invalid
-}
+if (!in_array($sort_column, $allowed_columns)) $sort_column = 'time_in';
+if (!in_array($sort_order, $allowed_orders)) $sort_order = 'DESC';
 
-if (!in_array($sort_order, $allowed_orders)) {
-    $sort_order = 'DESC'; // Default if invalid
-}
-
-// Date filtering
 $start_date = $_GET['start_date'] ?? '';
 $end_date = $_GET['end_date'] ?? '';
 $date_filter = '';
@@ -37,32 +28,23 @@ if ($start_date && $end_date) {
     $date_filter = " WHERE date <= '$end_date'";
 }
 
-// Query to fetch sit-in records from the database
 $sql = "SELECT r.id, r.id_no, r.name, r.purpose, r.lab_number, r.time_in, r.time_out, r.date
         FROM sit_in_records r
         $date_filter
         ORDER BY $sort_column $sort_order";
+
 $result = $conn->query($sql);
 
 if ($result && $result->num_rows > 0) {
     while ($row = $result->fetch_assoc()) {
-        $sit_in_id = htmlspecialchars($row['id']);
         $id_no = htmlspecialchars($row['id_no']);
         $name = htmlspecialchars($row['name']);
         $purpose = htmlspecialchars($row['purpose']);
         $lab_number = htmlspecialchars($row['lab_number']);
-        $time_in = htmlspecialchars($row['time_in']);
-        $time_out = htmlspecialchars($row['time_out'] ?? '—'); // Display "—" if time_out is null
+        $time_in = $row['time_in'] ? date('H:i:s', strtotime($row['time_in'])) : '—';
+        $time_out = $row['time_out'] ? date('H:i:s', strtotime($row['time_out'])) : '—';
         $date = htmlspecialchars($row['date']);
 
-        // Format time_out if it is available
-        if ($time_in) {
-            $time_in = date('H:i:s', strtotime($time_in)); // Format time_in as time only
-        }
-        if ($time_out !== '—') {
-            $time_out = date('H:i:s', strtotime($time_out)); // Format time_out as time only
-        }
-        // Append each record to the table row
         $sit_in_rows .= "
         <tr>
             <td>$id_no</td>
@@ -80,7 +62,6 @@ if ($result && $result->num_rows > 0) {
 
 $conn->close();
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -184,27 +165,13 @@ $conn->close();
         <table>
             <thead>
                 <tr>
-                    <th class="sortable" data-column="id">
-                        ID Number <span class="sort-arrow <?= $sort_column === 'id' && $sort_order === 'DESC' ? 'desc' : '' ?>"></span>
-                    </th>
-                    <th class="sortable" data-column="name">
-                        Name <span class="sort-arrow <?= $sort_column === 'name' && $sort_order === 'DESC' ? 'desc' : '' ?>"></span>
-                    </th>
-                    <th class="sortable" data-column="purpose">
-                        Purpose <span class="sort-arrow <?= $sort_column === 'purpose' && $sort_order === 'DESC' ? 'desc' : '' ?>"></span>
-                    </th>
-                    <th class="sortable" data-column="lab_number">
-                        Lab # <span class="sort-arrow <?= $sort_column === 'lab_number' && $sort_order === 'DESC' ? 'desc' : '' ?>"></span>
-                    </th>
-                    <th class="sortable" data-column="time_in">
-                        Time In <span class="sort-arrow <?= $sort_column === 'time_in' && $sort_order === 'DESC' ? 'desc' : '' ?>"></span>
-                    </th>
-                    <th class="sortable" data-column="time_out">
-                        Time Out <span class="sort-arrow <?= $sort_column === 'time_out' && $sort_order === 'DESC' ? 'desc' : '' ?>"></span>
-                    </th>
-                    <th class="sortable" data-column="date">
-                        Date <span class="sort-arrow <?= $sort_column === 'date' && $sort_order === 'DESC' ? 'desc' : '' ?>"></span>
-                    </th>
+                    <th class="sortable" data-column="id_no">ID Number <span class="sort-arrow <?= $sort_column === 'id_no' ? ($sort_order === 'ASC' ? 'asc' : '') : '' ?>"></span></th>
+                    <th class="sortable" data-column="name">Name <span class="sort-arrow <?= $sort_column === 'name' ? ($sort_order === 'ASC' ? 'asc' : '') : '' ?>"></span></th>
+                    <th class="sortable" data-column="purpose">Purpose <span class="sort-arrow <?= $sort_column === 'purpose' ? ($sort_order === 'ASC' ? 'asc' : '') : '' ?>"></span></th>
+                    <th class="sortable" data-column="lab_number">Lab # <span class="sort-arrow <?= $sort_column === 'lab_number' ? ($sort_order === 'ASC' ? 'asc' : '') : '' ?>"></span></th>
+                    <th class="sortable" data-column="time_in">Time In <span class="sort-arrow <?= $sort_column === 'time_in' ? ($sort_order === 'ASC' ? 'asc' : '') : '' ?>"></span></th>
+                    <th class="sortable" data-column="time_out">Time Out <span class="sort-arrow <?= $sort_column === 'time_out' ? ($sort_order === 'ASC' ? 'asc' : '') : '' ?>"></span></th>
+                    <th class="sortable" data-column="date">Date <span class="sort-arrow <?= $sort_column === 'date' ? ($sort_order === 'ASC' ? 'asc' : '') : '' ?>"></span></th>
                 </tr>
             </thead>
             <tbody id="sitInTable">
@@ -216,14 +183,13 @@ $conn->close();
 
 <script>
 document.addEventListener("DOMContentLoaded", function () {
-    let ascending = true;
     document.querySelectorAll('.sortable').forEach(header => {
         header.addEventListener('click', function() {
             const column = this.getAttribute('data-column');
+            const currentSort = '<?= $sort_column ?>';
             const currentOrder = '<?= $sort_order ?>';
-            const newOrder = currentOrder === 'ASC' ? 'DESC' : 'ASC';
-            
-            // Update the URL parameters for sorting
+            const newOrder = (column === currentSort && currentOrder === 'ASC') ? 'DESC' : 'ASC';
+
             const urlParams = new URLSearchParams(window.location.search);
             urlParams.set('sort', column);
             urlParams.set('order', newOrder);
@@ -231,7 +197,6 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 
-    // Search functionality
     document.getElementById("searchInput").addEventListener("keyup", function () {
         const filter = this.value.toUpperCase();
         document.querySelectorAll("#sitInTable tr").forEach(row => {
