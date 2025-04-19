@@ -54,7 +54,7 @@ $user = $_SESSION['user'];
         .resources h3, .materials h3 {
             font-weight: bold;
             font-size: 20px;
-            text-align: center; /* ✅ CENTERED TITLES */
+            text-align: center;
         }
 
         .card {
