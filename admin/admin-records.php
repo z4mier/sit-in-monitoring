@@ -18,19 +18,28 @@ if (!in_array($sort_order, $allowed_orders)) $sort_order = 'DESC';
 
 $start_date = $_GET['start_date'] ?? '';
 $end_date = $_GET['end_date'] ?? '';
-$date_filter = '';
+$search = $_GET['search'] ?? '';
+
+$filters = [];
 
 if ($start_date && $end_date) {
-    $date_filter = " WHERE date BETWEEN '$start_date' AND '$end_date'";
+    $filters[] = "date BETWEEN '$start_date' AND '$end_date'";
 } elseif ($start_date) {
-    $date_filter = " WHERE date >= '$start_date'";
+    $filters[] = "date >= '$start_date'";
 } elseif ($end_date) {
-    $date_filter = " WHERE date <= '$end_date'";
+    $filters[] = "date <= '$end_date'";
 }
+
+if (!empty($search)) {
+    $search = $conn->real_escape_string($search);
+    $filters[] = "(id_no LIKE '%$search%' OR name LIKE '%$search%' OR purpose LIKE '%$search%' OR lab_number LIKE '%$search%')";
+}
+
+$where_clause = count($filters) ? "WHERE " . implode(" AND ", $filters) : "";
 
 $sql = "SELECT r.id, r.id_no, r.name, r.purpose, r.lab_number, r.time_in, r.time_out, r.date, r.points
         FROM sit_in_records r
-        $date_filter
+        $where_clause
         ORDER BY $sort_column $sort_order";
 
 $result = $conn->query($sql);
@@ -73,7 +82,6 @@ if ($result && $result->num_rows > 0) {
                 </form>
             </td>
         </tr>";
-
     }
 } else {
     $sit_in_rows = "<tr><td colspan='8'>No sit-in records found.</td></tr>";
@@ -90,82 +98,27 @@ $conn->close();
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"/>
     <style>
-        body {
-            margin: 0;
-            font-family: 'Inter', sans-serif;
-            display: flex;
-            background-color: #0d121e;
-            color: #ffffff;
-        }
-        .main-content {
-            margin-left: 80px;
-            padding: 20px;
-            flex: 1;
-        }
-        .sidebar:hover ~ .main-content {
-            margin-left: 180px;
-        }
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px;
-            border-bottom: 2px solid #333;
-        }
-        .table-container {
-            margin-top: 20px;
-            padding: 20px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        table th, table td {
-            padding: 15px;
-            text-align: center;
-        }
-        thead tr {
-            background-color: transparent !important;
-        }
-        table tr:nth-child(even) {
-            background-color: #111524;
-        }
-        table tr:nth-child(odd) {
-            background-color: #212b40;
-        }
-        table tr:hover {
-            background-color: #181a25;
-        }
-        .search-container {
-            display: flex;
-            align-items: center;
-            margin-bottom: 20px;
-            position: relative;
-        }
-        .search-container input {
-            padding: 10px 10px 10px 30px;
-            border: none;
-            border-radius: 20px;
-            width: 200px;
-            background-color: white;
-            color: black;
-        }
-        .search-container .search-icon {
-            position: absolute;
-            left: 10px;
-            color: black;
-        }
-        .sort-arrow {
-            margin-left: 5px;
-            transition: transform 0.3s;
-        }
-        .sort-arrow.asc {
-            transform: rotate(180deg);
-        }
-        td:nth-child(1) {
-            text-align: left;
-            padding-left: 70px;
-        }
+        body { margin: 0; font-family: 'Inter', sans-serif; display: flex; background-color: #0d121e; color: #ffffff; }
+        .main-content { margin-left: 80px; padding: 20px; flex: 1; }
+        .sidebar:hover ~ .main-content { margin-left: 180px; }
+        header { display: flex; justify-content: space-between; align-items: center; padding: 20px; border-bottom: 2px solid #333; }
+        .table-container { margin-top: 20px; padding: 20px; }
+        table { width: 100%; border-collapse: collapse; }
+        table th, table td { padding: 15px; text-align: center; }
+        thead tr { background-color: transparent !important; }
+        table tr:nth-child(even) { background-color: #111524; }
+        table tr:nth-child(odd) { background-color: #212b40; }
+        table tr:hover { background-color: #181a25; }
+        .search-container { display: flex; align-items: center; margin-bottom: 20px; position: relative; }
+        .search-container input { padding: 10px 10px 10px 30px; border: none; border-radius: 20px; width: 200px; background-color: white; color: black; }
+        .search-container .search-icon { position: absolute; left: 10px; color: black; }
+        .sort-arrow { margin-left: 5px; transition: transform 0.3s; }
+        .sort-arrow.asc { transform: rotate(180deg); }
+        td:nth-child(1) { text-align: left; padding-left: 70px; }
+        .pagination-wrapper { display: flex; justify-content: flex-end; align-items: center; gap: 15px; padding: 15px 20px 0 0; color: white; font-size: 14px; }
+        .pagination-wrapper select { background-color: #212b40; color: white; border: 1px solid #555; border-radius: 4px; padding: 5px 8px; }
+        .nav-buttons button { background-color: #212b40; color: white; border: none; padding: 6px 10px; margin-left: 5px; cursor: pointer; font-size: 16px; border-radius: 4px; }
+        .nav-buttons button:hover { background-color: #2e3b5e; }
     </style>
 </head>
 <body>
@@ -173,61 +126,106 @@ $conn->close();
 <?php include '../includes/admin-sidebar.php'; ?>
 
 <div class="main-content">
-    <header>
-        <h1>Sit-In Records</h1>
-        <div class="search-container">
-            <i class="fas fa-search search-icon"></i>
-            <input type="text" id="searchInput" placeholder="Search">
-        </div>
-    </header>
-
+<header>
+    <h1>Sit-In Records</h1>
+    <form class="search-container" method="GET" action="" id="searchForm">
+        <input type="text" name="search" id="searchInput" placeholder="Search" value="<?= htmlspecialchars($search) ?>" 
+               oninput="handleSearchInput(this)">
+        <i class="fas fa-search search-icon"></i>
+    </form>
+</header>
     <div class="table-container">
         <table>
             <thead>
             <tr>
-                <th class="sortable" data-column="id_no">ID Number <span class="sort-arrow <?= $sort_column === 'id_no' ? ($sort_order === 'ASC' ? 'asc' : '') : '' ?>"></span></th>
-                <th class="sortable" data-column="name">Name <span class="sort-arrow <?= $sort_column === 'name' ? ($sort_order === 'ASC' ? 'asc' : '') : '' ?>"></span></th>
-                <th class="sortable" data-column="purpose">Purpose <span class="sort-arrow <?= $sort_column === 'purpose' ? ($sort_order === 'ASC' ? 'asc' : '') : '' ?>"></span></th>
-                <th class="sortable" data-column="lab_number">Lab # <span class="sort-arrow <?= $sort_column === 'lab_number' ? ($sort_order === 'ASC' ? 'asc' : '') : '' ?>"></span></th>
-                <th class="sortable" data-column="time_in">Time In <span class="sort-arrow <?= $sort_column === 'time_in' ? ($sort_order === 'ASC' ? 'asc' : '') : '' ?>"></span></th>
-                <th class="sortable" data-column="time_out">Time Out <span class="sort-arrow <?= $sort_column === 'time_out' ? ($sort_order === 'ASC' ? 'asc' : '') : '' ?>"></span></th>
-                <th class="sortable" data-column="date">Date <span class="sort-arrow <?= $sort_column === 'date' ? ($sort_order === 'ASC' ? 'asc' : '') : '' ?>"></span></th>
-                <th class="sortable" data-column="points">Points <span class="sort-arrow <?= $sort_column === 'points' ? ($sort_order === 'ASC' ? 'asc' : '') : '' ?>"></span></th>
-                </tr>
-
+                <th>ID Number</th>
+                <th>Name</th>
+                <th>Purpose</th>
+                <th>Lab #</th>
+                <th>Time In</th>
+                <th>Time Out</th>
+                <th>Date</th>
+                <th>Points</th>
+            </tr>
             </thead>
             <tbody id="sitInTable">
                 <?= $sit_in_rows ?>
             </tbody>
         </table>
+
+        <div class="pagination-wrapper">
+            <div class="rows-selector">
+                Rows per page:
+                <select id="rowsPerPage" onchange="updatePagination()">
+                    <option value="5">5</option>
+                    <option value="10" selected>10</option>
+                    <option value="20">20</option>
+                    <option value="50">50</option>
+                </select>
+            </div>
+            <div id="pageInfo"></div>
+            <div class="nav-buttons">
+                <button onclick="goToFirstPage()">«</button>
+                <button onclick="goToPreviousPage()">‹</button>
+                <button onclick="goToNextPage()">›</button>
+                <button onclick="goToLastPage()">»</button>
+            </div>
+        </div>
     </div>
 </div>
 
 <script>
-document.addEventListener("DOMContentLoaded", function () {
-    document.querySelectorAll('.sortable').forEach(header => {
-        header.addEventListener('click', function() {
-            const column = this.getAttribute('data-column');
-            const currentSort = '<?= $sort_column ?>';
-            const currentOrder = '<?= $sort_order ?>';
-            const newOrder = (column === currentSort && currentOrder === 'ASC') ? 'DESC' : 'ASC';
+let searchTimeout;
 
-            const urlParams = new URLSearchParams(window.location.search);
-            urlParams.set('sort', column);
-            urlParams.set('order', newOrder);
-            window.location.search = urlParams.toString();
-        });
-    });
+function handleSearchInput(input) {
+  clearTimeout(searchTimeout);
+  searchTimeout = setTimeout(() => {
+    document.getElementById('searchForm').submit();
+  }, 500);
+}
 
-    document.getElementById("searchInput").addEventListener("keyup", function () {
-        const filter = this.value.toUpperCase();
-        document.querySelectorAll("#sitInTable tr").forEach(row => {
-            const text = row.textContent || row.innerText;
-            row.style.display = text.toUpperCase().includes(filter) ? "" : "none";
-        });
-    });
+document.getElementById('searchInput').addEventListener('keypress', function(e) {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    document.getElementById('searchForm').submit();
+  }
 });
-</script>
 
+let currentPage = 1;
+let rowsPerPage = 10;
+const table = document.getElementById("sitInTable");
+const allRows = Array.from(table.querySelectorAll("tr"));
+const pageInfo = document.getElementById("pageInfo");
+
+function updatePagination() {
+  rowsPerPage = parseInt(document.getElementById("rowsPerPage").value);
+  currentPage = 1;
+  displayPage();
+}
+
+function displayPage() {
+  table.innerHTML = '';
+  const totalPages = Math.ceil(allRows.length / rowsPerPage);
+  const start = (currentPage - 1) * rowsPerPage;
+  const end = start + rowsPerPage;
+  const visibleRows = allRows.slice(start, end);
+  visibleRows.forEach(row => table.appendChild(row));
+  pageInfo.innerText = `Page ${currentPage} of ${totalPages}`;
+}
+
+function goToFirstPage() { currentPage = 1; displayPage(); }
+function goToPreviousPage() { if (currentPage > 1) currentPage--; displayPage(); }
+function goToNextPage() {
+  const totalPages = Math.ceil(allRows.length / rowsPerPage);
+  if (currentPage < totalPages) currentPage++;
+  displayPage();
+}
+function goToLastPage() {
+  currentPage = Math.ceil(allRows.length / rowsPerPage);
+  displayPage();
+}
+
+window.onload = displayPage;
+</script>
 </body>
 </html>

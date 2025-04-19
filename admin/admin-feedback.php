@@ -4,11 +4,11 @@ include '../includes/db-connection.php';
 
 $feedback_rows = '';
 
-// Get feedback with corresponding sit-in info
 $query = "
 SELECT 
     f.id_no, 
     u.firstname, 
+    u.middlename,
     u.lastname, 
     COALESCE(s.lab_number, 'N/A') AS lab_number, 
     COALESCE(s.purpose, 'N/A') AS purpose, 
@@ -16,15 +16,7 @@ SELECT
     f.date
 FROM feedback f
 LEFT JOIN users u ON f.id_no = u.id_no
-LEFT JOIN (
-    SELECT id_no, lab_number, purpose, date
-    FROM sit_in_records s
-    WHERE (id_no, date, id) IN (
-        SELECT id_no, date, MAX(id)
-        FROM sit_in_records
-        GROUP BY id_no, date
-    )
-) s ON f.id_no = s.id_no AND f.date = s.date
+LEFT JOIN sit_in_records s ON f.record_id = s.id
 ORDER BY f.date DESC
 ";
 
@@ -32,7 +24,12 @@ $result = $conn->query($query);
 
 if ($result && $result->num_rows > 0) {
     while ($row = $result->fetch_assoc()) {
-        $full_name = htmlspecialchars($row['firstname'] . ' ' . $row['lastname']);
+        $full_name = htmlspecialchars(trim(
+            $row['firstname'] . ' ' .
+            (!empty($row['middlename']) ? $row['middlename'] . ' ' : '') .
+            $row['lastname']
+        ));
+
         $feedback_rows .= "<tr>
             <td>" . htmlspecialchars($row['id_no']) . "</td>
             <td>$full_name</td>
@@ -107,6 +104,34 @@ $conn->close();
     table tr:hover {
       background-color: #181a25;
     }
+    .pagination-wrapper {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 15px;
+      padding-top: 15px;
+      font-size: 14px;
+    }
+    .pagination-wrapper select {
+      background-color: #212b40;
+      color: white;
+      border: 1px solid #555;
+      border-radius: 4px;
+      padding: 5px 8px;
+    }
+    .nav-buttons button {
+      background-color: #212b40;
+      color: white;
+      border: none;
+      padding: 6px 10px;
+      margin-left: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      border-radius: 4px;
+    }
+    .nav-buttons button:hover {
+      background-color: #2e3b5e;
+    }
   </style>
 </head>
 <body>
@@ -130,12 +155,69 @@ $conn->close();
           <th>Message</th>
         </tr>
       </thead>
-      <tbody>
+      <tbody id="sitInTable">
         <?= $feedback_rows ?>
       </tbody>
     </table>
   </div>
+
+  <div class="pagination-wrapper">
+    <div class="rows-selector">
+      Rows per page:
+      <select id="rowsPerPage" onchange="updatePagination()">
+        <option value="5">5</option>
+        <option value="10" selected>10</option>
+        <option value="20">20</option>
+        <option value="50">50</option>
+      </select>
+    </div>
+    <div id="pageInfo"></div>
+    <div class="nav-buttons">
+      <button onclick="goToFirstPage()">«</button>
+      <button onclick="goToPreviousPage()">‹</button>
+      <button onclick="goToNextPage()">›</button>
+      <button onclick="goToLastPage()">»</button>
+    </div>
+  </div>
 </div>
+
+<script>
+let currentPage = 1;
+let rowsPerPage = 10;
+const table = document.getElementById("sitInTable");
+const allRows = Array.from(table.querySelectorAll("tr"));
+const pageInfo = document.getElementById("pageInfo");
+
+function updatePagination() {
+  rowsPerPage = parseInt(document.getElementById("rowsPerPage").value);
+  currentPage = 1;
+  displayPage();
+}
+
+function displayPage() {
+  table.innerHTML = '';
+  const totalPages = Math.ceil(allRows.length / rowsPerPage);
+  const start = (currentPage - 1) * rowsPerPage;
+  const end = start + rowsPerPage;
+  const visibleRows = allRows.slice(start, end);
+  visibleRows.forEach(row => table.appendChild(row));
+  pageInfo.innerText = `Page ${currentPage} of ${totalPages}`;
+}
+
+function goToFirstPage() { currentPage = 1; displayPage(); }
+function goToPreviousPage() { if (currentPage > 1) currentPage--; displayPage(); }
+function goToNextPage() {
+  const totalPages = Math.ceil(allRows.length / rowsPerPage);
+  if (currentPage < totalPages) currentPage++;
+  displayPage();
+}
+function goToLastPage() {
+  currentPage = Math.ceil(allRows.length / rowsPerPage);
+  displayPage();
+}
+
+window.onload = displayPage;
+</script>
 
 </body>
 </html>

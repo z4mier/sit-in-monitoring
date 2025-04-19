@@ -24,8 +24,7 @@ if ($result && $result->num_rows > 0) {
         $course_js = json_encode($course);
         $remaining_sessions_js = json_encode($remaining_sessions);
 
-        $student_rows .= "
-<tr>
+        $student_rows .= "<tr>
     <td>$student_id</td>
     <td>$student_name</td>
     <td>$yr_level</td>
@@ -35,11 +34,11 @@ if ($result && $result->num_rows > 0) {
         <button class='edit-btn' onclick='openEditModal($student_id_js, $student_name_js, $yr_level_js, $course_js, $remaining_sessions_js)' title='Edit'>
             <i class='fas fa-edit'></i>
         </button>
-        <button class='reset-btn' onclick='resetStudent($student_id_js)' title='Reset Sessions'>
-            <i class='fas fa-undo'></i>
-        </button>
         <button class='delete-btn' onclick='confirmDelete($student_id_js)' title='Delete'>
             <i class='fas fa-trash-alt'></i>
+        </button>
+        <button class='reset-btn' onclick='resetStudent($student_id_js)' title='Reset Sessions'>
+            <i class='fas fa-undo'></i>
         </button>
     </td>
 </tr>";
@@ -79,7 +78,6 @@ $conn->close();
     .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #ddd; }
     .modal-body form { display: flex; flex-direction: column; gap: 15px; }
     .modal-body label { font-weight: bold; display: block; margin-bottom: 10px; }
-    .modal-body label:first-of-type {margin-top: 15px;}
     .modal-body input, .modal-body select { font-size: 1em; width: 100%; padding: 5px; border: 1px solid #333; border-radius: 5px; background-color: #212b40; color: white; }
     .modal-footer { display: flex; justify-content: flex-end; gap: 10px; border-top: 2px solid #ddd; margin-top: 20px; padding-top: 10px; }
     .modal-footer button { padding: 10px 15px; border: none; border-radius: 5px; cursor: pointer; font-size: 1em; }
@@ -87,7 +85,10 @@ $conn->close();
     .modal-footer button:last-child { background-color: #007bff; color: white; }
     .close {cursor: pointer;font-size: 1.5em;color: #777;transition: color 0.3s; }
     .close:hover {color: red;}
-    
+    .pagination-wrapper { display: flex; justify-content: flex-end; align-items: center; gap: 15px; padding: 15px 20px 0 0; color: white; font-size: 14px; }
+    .pagination-wrapper select { background-color: #212b40; color: white; border: 1px solid #555; border-radius: 4px; padding: 5px 8px; }
+    .nav-buttons button { background-color: #212b40; color: white; border: none; padding: 6px 10px; margin-left: 5px; cursor: pointer; font-size: 16px; border-radius: 4px; }
+    .nav-buttons button:hover { background-color: #2e3b5e; }
   </style>
 </head>
 <body>
@@ -107,26 +108,43 @@ $conn->close();
   </div>
 </header>
 
-  <?php if (isset($_GET['reset_success'])): ?>
-    <script>alert('Remaining sessions successfully reset!');</script>
-  <?php endif; ?>
+<?php if (isset($_GET['reset_success'])): ?>
+<script>alert('Remaining sessions successfully reset!');</script>
+<?php endif; ?>
 
-  <div class="table-container">
-    <table>
-      <thead>
-        <tr>
-          <th>ID Number</th>
-          <th>Name</th>
-          <th>Year Level</th>
-          <th>Course</th>
-          <th>Remaining Sessions</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody id="studentTable">
-        <?= $student_rows ?>
-      </tbody>
-    </table>
+<div class="table-container">
+  <table>
+    <thead>
+      <tr>
+        <th>ID Number</th>
+        <th>Name</th>
+        <th>Year Level</th>
+        <th>Course</th>
+        <th>Remaining Sessions</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody id="studentTable">
+      <?= $student_rows ?>
+    </tbody>
+  </table>
+  <div class="pagination-wrapper">
+    <div class="rows-selector">
+      Rows per page:
+      <select id="rowsPerPage" onchange="updatePagination()">
+        <option value="5">5</option>
+        <option value="10" selected>10</option>
+        <option value="20">20</option>
+        <option value="50">50</option>
+      </select>
+    </div>
+    <div id="pageInfo"></div>
+    <div class="nav-buttons">
+      <button onclick="goToFirstPage()">«</button>
+      <button onclick="goToPreviousPage()">‹</button>
+      <button onclick="goToNextPage()">›</button>
+      <button onclick="goToLastPage()">»</button>
+    </div>
   </div>
 </div>
 
@@ -230,6 +248,38 @@ document.getElementById("editStudentForm").addEventListener("submit", function (
   })
   .catch(error => console.error("Error:", error));
 });
+let currentPage = 1;
+let rowsPerPage = 10;
+const table = document.getElementById("studentTable");
+const allRows = Array.from(table.querySelectorAll("tr"));
+const pageInfo = document.getElementById("pageInfo");
+
+function updatePagination() {
+  rowsPerPage = parseInt(document.getElementById("rowsPerPage").value);
+  currentPage = 1;
+  displayPage();
+}
+
+function displayPage() {
+  table.innerHTML = '';
+  const totalPages = Math.ceil(allRows.length / rowsPerPage);
+  const start = (currentPage - 1) * rowsPerPage;
+  const end = start + rowsPerPage;
+  const visibleRows = allRows.slice(start, end);
+  visibleRows.forEach(row => table.appendChild(row));
+  pageInfo.innerText = `Page ${currentPage} of ${totalPages}`;
+}
+
+function goToFirstPage() { currentPage = 1; displayPage(); }
+function goToPreviousPage() { if (currentPage > 1) currentPage--; displayPage(); }
+function goToNextPage() {
+  const totalPages = Math.ceil(allRows.length / rowsPerPage);
+  if (currentPage < totalPages) currentPage++;
+  displayPage();
+}
+function goToLastPage() { currentPage = Math.ceil(allRows.length / rowsPerPage); displayPage(); }
+
+window.onload = displayPage;
 </script>
 
 </body>
