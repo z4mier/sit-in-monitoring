@@ -37,8 +37,9 @@ if (!empty($search)) {
 
 $where_clause = count($filters) ? "WHERE " . implode(" AND ", $filters) : "";
 
-$sql = "SELECT r.id, r.id_no, r.name, r.purpose, r.lab_number, r.time_in, r.time_out, r.date, r.points
+$sql = "SELECT r.id, r.id_no, r.name, r.purpose, r.lab_number, r.time_in, r.time_out, r.date, r.points, u.remaining_sessions
         FROM sit_in_records r
+        JOIN users u ON r.id_no = u.id_no
         $where_clause
         ORDER BY $sort_column $sort_order";
 
@@ -54,7 +55,11 @@ if ($result && $result->num_rows > 0) {
         $time_in = $row['time_in'] ? date('H:i:s', strtotime($row['time_in'])) : '—';
         $time_out = $row['time_out'] ? date('H:i:s', strtotime($row['time_out'])) : '—';
         $date = htmlspecialchars($row['date']);
-        $points = htmlspecialchars($row['points'] ?? 0);
+        $points = (int)($row['points'] ?? 0);
+        $remaining_sessions = (int)$row['remaining_sessions'];
+
+        $disabled = $remaining_sessions >= 30 ? "disabled" : "";
+        $messageText = $remaining_sessions >= 30 ? "<span style='color: #f87171; font-size: 13px;'>Student has reached the maximum sessions</span>" : "";
 
         $sit_in_rows .= "
         <tr>
@@ -66,29 +71,70 @@ if ($result && $result->num_rows > 0) {
             <td>$time_out</td>
             <td>$date</td>
             <td>
-                <form method='POST' action='../includes/assign-points.php' style='display: flex; justify-content: center; align-items: center; gap: 6px;'>
-                    <input type='hidden' name='sit_in_id' value='$id'>
-                    <input 
-                        type='number' 
-                        name='points' 
-                        min='0' 
-                        max='1' 
-                        oninput='this.value = Math.max(0, Math.min(1, this.value));'
-                        style='width: 50px; padding: 6px; text-align: center; font-size: 14px;' 
-                    />
-                    <button type='submit' style='border: none; background-color: white; color: #111524; border-radius: 5px; padding: 6px 10px; cursor: pointer;' title='Add Point'>
-                        <i class='fas fa-plus'></i>
-                    </button>
-                </form>
+                <div style='display: flex; flex-direction: column; align-items: center; gap: 6px;'>
+                    <span style='font-size: 14px;'>Given: <strong>$points</strong></span>
+                    <form method='POST' action='../includes/assign-points.php' style='display: flex; justify-content: center; align-items: center; gap: 6px;'>
+                        <input type='hidden' name='sit_in_id' value='$id'>
+                        <input 
+                            type='number' 
+                            name='points' 
+                            min='0' 
+                            max='1' 
+                            oninput='this.value = Math.max(0, Math.min(1, this.value));'
+                            style='width: 50px; padding: 6px; text-align: center; font-size: 14px;' 
+                            $disabled
+                        />
+                        <button type='submit' style='border: none; background-color: white; color: #111524; border-radius: 5px; padding: 6px 10px; cursor: pointer;' title='Add Point' $disabled>
+                            <i class='fas fa-plus'></i>
+                        </button>
+                    </form>
+                </div>
             </td>
+            <td>$messageText</td>
         </tr>";
     }
 } else {
-    $sit_in_rows = "<tr><td colspan='8'>No sit-in records found.</td></tr>";
+    $sit_in_rows = "<tr><td colspan='10'>No sit-in records found.</td></tr>";
 }
 
 $conn->close();
 ?>
+
+<?php if (!empty($notification_message)): ?>
+<div style="
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: <?= $notification_type === 'success' ? '#212b40' : '#f44336' ?>;
+    border: 2px solid white;
+    color: white;
+    padding: 12px 25px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 500;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 0 12px rgba(0,0,0,0.4);
+">
+    <i class="<?= $notification_type === 'success' ? 'fas fa-check-circle' : 'fas fa-times-circle' ?>" style="color: white;"></i>
+    <span><?= $notification_message ?></span>
+</div>
+
+<script>
+  setTimeout(() => {
+    const notif = document.querySelector('div[style*="position: fixed"]');
+    if (notif) {
+      notif.style.transition = "opacity 0.6s";
+      notif.style.opacity = "0";
+      setTimeout(() => notif.remove(), 600);
+    }
+  }, 3000); // Auto-hide after 3 seconds
+</script>
+<?php endif; ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -146,6 +192,7 @@ $conn->close();
                 <th>Time Out</th>
                 <th>Date</th>
                 <th>Points</th>
+                <th>Session Status</th>
             </tr>
             </thead>
             <tbody id="sitInTable">

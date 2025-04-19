@@ -13,7 +13,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['sit_in_id'], $_POST['
         exit;
     }
 
-    // Fetch the sit-in record
     $stmt = $conn->prepare("SELECT id_no, points FROM sit_in_records WHERE id = ?");
     $stmt->bind_param("i", $sit_in_id);
     $stmt->execute();
@@ -29,45 +28,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['sit_in_id'], $_POST['
 
     $id_no = $record['id_no'];
     $current_points = (int)$record['points'];
-    $new_points = $current_points + $points_to_add;
+    $new_total_points = $current_points + $points_to_add;
 
-    // Check if it hits or exceeds 3 points
-    if ($new_points >= 3) {
-        $extra_sessions = intdiv($new_points, 3);
-        $remaining_points = $new_points % 3;
+    $stmt_user = $conn->prepare("SELECT remaining_sessions FROM users WHERE id_no = ?");
+    $stmt_user->bind_param("s", $id_no);
+    $stmt_user->execute();
+    $user_result = $stmt_user->get_result();
+    $user = $user_result->fetch_assoc();
 
-        // Reset points and update user session
-        $conn->begin_transaction();
-        try {
-            // Update sit-in record
-            $stmt1 = $conn->prepare("UPDATE sit_in_records SET points = ? WHERE id = ?");
-            $stmt1->bind_param("ii", $remaining_points, $sit_in_id);
-            $stmt1->execute();
+    $remaining_sessions = (int)$user['remaining_sessions'];
+    $sessions_to_add = intdiv($new_total_points, 3);
+    $should_add_session = $sessions_to_add > 0 && $remaining_sessions < 30;
 
-            // Add sessions to user
+    $conn->begin_transaction();
+    try {
+        // Always update points (no reset)
+        $stmt1 = $conn->prepare("UPDATE sit_in_records SET points = ? WHERE id = ?");
+        $stmt1->bind_param("ii", $new_total_points, $sit_in_id);
+        $stmt1->execute();
+
+        if ($should_add_session) {
+            $actual_sessions_to_add = min($sessions_to_add, 30 - $remaining_sessions);
             $stmt2 = $conn->prepare("UPDATE users SET remaining_sessions = remaining_sessions + ? WHERE id_no = ?");
-            $stmt2->bind_param("is", $extra_sessions, $id_no);
+            $stmt2->bind_param("is", $actual_sessions_to_add, $id_no);
             $stmt2->execute();
-
-            $conn->commit();
-            $_SESSION['notification_message'] = "Points assigned and session(s) added!";
-            $_SESSION['notification_type'] = "success";
-        } catch (Exception $e) {
-            $conn->rollback();
-            $_SESSION['notification_message'] = "Transaction failed: " . $e->getMessage();
-            $_SESSION['notification_type'] = "error";
-        }
-    } else {
-        // Just update points if less than 3
-        $stmt = $conn->prepare("UPDATE sit_in_records SET points = ? WHERE id = ?");
-        $stmt->bind_param("ii", $new_points, $sit_in_id);
-        if ($stmt->execute()) {
-            $_SESSION['notification_message'] = "Points updated.";
-            $_SESSION['notification_type'] = "success";
+            $_SESSION['notification_message'] = "Points updated and $actual_sessions_to_add session(s) added!";
         } else {
-            $_SESSION['notification_message'] = "Failed to update points.";
-            $_SESSION['notification_type'] = "error";
+            $_SESSION['notification_message'] = "Points updated.";
         }
+
+        $_SESSION['notification_type'] = "success";
+        $conn->commit();
+    } catch (Exception $e) {
+        $conn->rollback();
+        $_SESSION['notification_message'] = "Transaction failed: " . $e->getMessage();
+        $_SESSION['notification_type'] = "error";
     }
 } else {
     $_SESSION['notification_message'] = "Invalid request.";
