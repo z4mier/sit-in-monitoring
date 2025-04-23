@@ -22,7 +22,7 @@ if ($user_result->num_rows === 0) {
 }
 
 $student = $user_result->fetch_assoc();
-$id_no = $student['id_no']; // 
+$id_no = $student['id_no'];
 
 
 $lab_options = ['Mac Laboratory', '540', '530', '526'];
@@ -54,88 +54,25 @@ $reservations = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
   <title>Reservation</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
   <style>
-    body {
-      margin: 0;
-      font-family: 'Inter', sans-serif;
-      background-color: #0d121e;
-      color: white;
-    }
-    .content {
-      margin-left: 270px;
-      padding-top: 150px;
-    }
-    .dashboard-row {
-      display: flex;
-      gap: 20px;
-      flex-wrap: wrap;
-    }
-    form input[type="date"] {
-      -webkit-appearance: none;
-      appearance: none;
-      box-sizing: border-box;
-    }
-    .form-box, .table-box {
-      flex: 1;
-      min-width: 0;
-      padding: 20px;
-      background-color: #0d121e;
-      border: 2px solid white;
-      border-radius: 20px;
-      box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
-      max-height: 600px;
-      overflow-y: auto;
-    }
-    .form-box h3, .table-box h3 {
-      text-align: center;
-      font-size: 20px;
-      margin-bottom: 15px;
-    }
-    .form-box h3 i, .table-box h3 i {
-      margin-right: 10px;
-    }
-    form label {
-      display: block;
-      margin: 10px 0 5px;
-    }
-    form select, form input[type="date"] {
-      width: 100%;
-      padding: 10px;
-      border-radius: 20px;
-      border: none;
-      font-size: 14px;
-    }
-    form button {
-      margin-top: 15px;
-      width: 100%;
-      padding: 12px;
-      background-color: #212b40;
-      color: white;
-      border: none;
-      border-radius: 20px;
-      cursor: pointer;
-      font-size: 15px;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-    th, td {
-      padding: 12px;
-      text-align: center;
-    }
-    tr:nth-child(even) { background-color: #111524; }
-    tr:nth-child(odd) { background-color: #212b40; }
-    .status {
-      padding: 5px 10px;
-      border-radius: 5px;
-    }
-    thead tr {
-      background-color: transparent !important;
-    }
-    .Pending, .Approved, .Rejected {
-      color: white;
-    }
+      body { margin: 0; font-family: 'Inter', sans-serif; background-color: #0d121e; color: white; }
+      .content { margin-left: 270px; padding-top: 150px; }
+      .dashboard-row { display: flex; gap: 20px; flex-wrap: wrap; }
+      form input[type="date"] { -webkit-appearance: none; appearance: none; box-sizing: border-box; }
+      .form-box, .table-box { flex: 1; min-width: 0; padding: 20px; background-color: #0d121e; border: 2px solid white; border-radius: 20px; box-shadow: 0 0 10px rgba(255, 255, 255, 0.3); max-height: 600px; overflow-y: auto; }
+      .form-box h3, .table-box h3 { text-align: center; font-size: 20px; margin-bottom: 15px; }
+      .form-box h3 i, .table-box h3 i { margin-right: 10px; }
+      form label { display: block; margin: 10px 0 5px; }
+      form select, form input[type="date"] { width: 100%; padding: 10px; border-radius: 20px; border: none; font-size: 14px; }
+      form button { margin-top: 15px; width: 100%; padding: 12px; background-color: #212b40; color: white; border: none; border-radius: 20px; cursor: pointer; font-size: 15px; }
+      table { width: 100%; border-collapse: collapse; }
+      th, td { padding: 12px; text-align: center; }
+      tr:nth-child(even) { background-color: #111524; }
+      tr:nth-child(odd) { background-color: #212b40; }
+      .status { padding: 5px 10px; border-radius: 5px; }
+      thead tr { background-color: transparent !important; }
+      .Pending, .Approved, .Rejected { color: white; }
   </style>
+
 </head>
 <body>
 <?php include 'includes/sidebar.php'; ?>

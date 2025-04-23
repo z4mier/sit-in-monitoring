@@ -47,111 +47,26 @@ $history_result = $history_stmt->get_result();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://kit.fontawesome.com/04f888fcdb.js" crossorigin="anonymous"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #0d121e;
-            margin: 0;
-            padding: 0;
-            color: white;
-        }
-        .container {
-            margin-left: 270px;
-            padding: 30px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 25px;
-        }
-        th, td {
-            padding: 12px 10px;
-            text-align: left;
-        }
-        th {
-            background-color: #181a25;
-            font-weight: bold;
-        }
-        tr:nth-child(even) {
-            background-color: #1c2233;
-        }
-        tr:nth-child(odd) {
-            background-color: #11141f;
-        }
-        .btn-icon {
-            background: none;
-            border: none;
-            color: white;
-            font-size: 16px;
-            cursor: pointer;
-        }
-        .btn-icon:hover {
-            color: #ccc;
-        }
-
-        /* Modal */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 99;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.6);
-            justify-content: center;
-            align-items: center;
-        }
-        .modal-content {
-            background-color: #1c2233;
-            padding: 20px;
-            border-radius: 12px;
-            width: 500px;
-            color: white;
-            box-shadow: 0 0 15px rgba(0,0,0,0.4);
-        }
-        .modal-content textarea {
-            width: 93%;
-            height: 120px;
-            padding: 12px 15px;
-            border-radius: 10px;
-            border: none;
-            resize: none;
-            font-family: 'Inter', sans-serif;
-            background-color: #0d121e;
-            color: white;
-            font-size: 14px;
-            margin-top: 10px;
-        }
-        .modal-content button {
-            margin-top: 15px;
-            padding: 8px 18px;
-            border: none;
-            border-radius: 8px;
-            background-color: white;
-            color: #0d121e;
-            cursor: pointer;
-            font-size: 14px;
-        }
-        .modal-content button:hover {
-            background-color: #ccc;
-        }
-        .modal-content .close {
-            float: right;
-            font-size: 18px;
-            cursor: pointer;
-            color: white;
-            font-weight: bold;
-        }
-        .modal-content .close:hover {
-            color: #ccc;
-        }
-        .modal-content h3 {
-            margin: 0 0 10px;
-            font-size: 18px;
-            font-weight: 600;
-        }
+            @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+            body { font-family: 'Inter', sans-serif; background-color: #0d121e; margin: 0; padding: 0; color: white; }
+            .container { margin-left: 270px; padding: 30px; }
+            table { width: 100%; border-collapse: collapse; margin-top: 25px; }
+            th, td { padding: 12px 10px; text-align: left; }
+            th { background-color: #181a25; font-weight: bold; }
+            tr:nth-child(even) { background-color: #1c2233; }
+            tr:nth-child(odd) { background-color: #11141f; }
+            .btn-icon { background: none; border: none; color: white; font-size: 16px; cursor: pointer; }
+            .btn-icon:hover { color: #ccc; }
+            .modal { display: none; position: fixed; z-index: 99; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.6); justify-content: center; align-items: center; }
+            .modal-content { background-color: #1c2233; padding: 20px; border-radius: 12px; width: 500px; color: white; box-shadow: 0 0 15px rgba(0,0,0,0.4); }
+            .modal-content textarea { width: 93%; height: 120px; padding: 12px 15px; border-radius: 10px; border: none; resize: none; font-family: 'Inter', sans-serif; background-color: #0d121e; color: white; font-size: 14px; margin-top: 10px; }
+            .modal-content button { margin-top: 15px; padding: 8px 18px; border: none; border-radius: 8px; background-color: white; color: #0d121e; cursor: pointer; font-size: 14px; }
+            .modal-content button:hover { background-color: #ccc; }
+            .modal-content .close { float: right; font-size: 18px; cursor: pointer; color: white; font-weight: bold; }
+            .modal-content .close:hover { color: #ccc; }
+            .modal-content h3 { margin: 0 0 10px; font-size: 18px; font-weight: 600; }
     </style>
+
 </head>
 <body>
 <?php include 'includes/sidebar.php'; ?>
@@ -197,7 +112,6 @@ $history_result = $history_stmt->get_result();
     </table>
 </div>
 
-<!-- Feedback Modal -->
 <div id="feedbackModal" class="modal">
     <div class="modal-content">
         <span class="close" onclick="closeFeedbackModal()">&times;</span>
@@ -211,8 +125,6 @@ $history_result = $history_stmt->get_result();
         </form>
     </div>
 </div>
-
-
 
 <script>
     function openFeedbackModal(recordId) {

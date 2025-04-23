@@ -6,71 +6,18 @@
   <title>Laboratory Rules and Regulations - University of Cebu</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
-    body {
-      font-family: 'Inter', sans-serif;
-      background-color: #0d121e;
-      margin: 0;
-      padding: 0;
-      color: white;
-    }
-
-    .content {
-      margin-left: 270px;
-      padding: 20px;
-      box-sizing: border-box;
-    }
-
-    .rules-wrapper {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 20px;
-      padding-top: 30px;
-    }
-
-    .rules, .disciplinary {
-      flex: 1 1 45%;
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-      padding: 30px 20px 20px;
-      border-radius: 15px;
-      border: 2px solid white;
-      background-color: #0d121e;
-      box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
-    }
-
-    .rules h3, .disciplinary h3 {
-      font-size: 20px;
-      font-weight: bold;
-      margin-bottom: 10px;
-      text-align: center;
-    }
-
-    .rules ul, .rules ol, .disciplinary p {
-      line-height: 1.6;
-      text-align: justify;
-    }
-
-    ul {
-      padding-left: 20px;
-    }
-
-    ol {
-      margin-top: 10px;
-      padding-left: 20px;
-    }
-
-    @media screen and (max-width: 1024px) {
-      .rules-wrapper {
-        flex-direction: column;
-      }
-
-      .rules, .disciplinary {
-        width: 100%;
-      }
-    }
+      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+      body { font-family: 'Inter', sans-serif; background-color: #0d121e; margin: 0; padding: 0; color: white; }
+      .content { margin-left: 270px; padding: 20px; box-sizing: border-box; }
+      .rules-wrapper { display: flex; flex-wrap: wrap; gap: 20px; padding-top: 30px; }
+      .rules, .disciplinary { flex: 1 1 45%; display: flex; flex-direction: column; gap: 20px; padding: 30px 20px 20px; border-radius: 15px; border: 2px solid white; background-color: #0d121e; box-shadow: 0 0 10px rgba(255, 255, 255, 0.3); }
+      .rules h3, .disciplinary h3 { font-size: 20px; font-weight: bold; margin-bottom: 10px; text-align: center; }
+      .rules ul, .rules ol, .disciplinary p { line-height: 1.6; text-align: justify; }
+      ul { padding-left: 20px; }
+      ol { margin-top: 10px; padding-left: 20px; }
+      @media screen and (max-width: 1024px) { .rules-wrapper { flex-direction: column; } .rules, .disciplinary { width: 100%; } }
   </style>
+
 </head>
 <body>
 
@@ -79,7 +26,6 @@
 <div class="content">
   <div class="rules-wrapper">
 
-    <!-- Lab Rules Section -->
     <div class="rules">
       <h3><i class="fas fa-book"></i> Lab Rules & Regulations</h3>
       <p>To avoid embarrassment and maintain camaraderie with your friends and superiors at our laboratories, please observe the following:</p>
@@ -107,7 +53,6 @@
       </ul>
     </div>
 
-    <!-- Disciplinary Action Section -->
     <div class="disciplinary">
       <h3><i class="fas fa-gavel"></i> Disciplinary Action</h3>
       <p><strong>First Offense:</strong><br>

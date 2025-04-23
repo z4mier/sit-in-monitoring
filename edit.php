@@ -91,111 +91,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sit-In Monitoring System</title>
+
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #0d121e;
-            margin: 0;
-            padding: 0;
-        }
-
-        .header {
-            color: white;
-            padding: 15px 15px;
-            text-align: center;
-        }
-
-        .card {
-            color: white;
-            padding: 20px;
-            margin: 20px auto;
-            border-radius: 20px;
-            border: 2px solid white;
-            max-width: 500px;
-            position: relative; 
-        }
-
-        .profile-section {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            flex: 1;
-        }
-
-        .profile-section h2 {
-            margin-bottom: 15px;
-        }
-
-        .profile-img {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            object-fit: cover;
-            cursor: pointer;
-            transition: transform 0.2s ease-in-out;
-        }      
-        .form-group {
-            margin-bottom: 10px;
-            width: 100%;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-            font-size: 16px;
-            color: white;
-        }
-
-        .form-group input, .form-group select {
-            width: 100%;
-            padding: 10px;
-            font-size: 16px;
-            border-radius: 10px;
-            background-color: #1a1f2e;
-            color: white;
-            outline: none;
-            box-sizing: border-box;
-            border: none;
-        }
-
-        .save-btn {
-            display: block;
-            width: 30%;
-            padding: 10px;
-            font-size: 16px;
-            font-weight: bold;
-            background-color: #0d121e;
-            color: white;
-            border: 1px solid white;
-            border-radius: 10px;
-            margin: 20px auto 0;
-            cursor: pointer;
-            text-align: center;
-        }
-
-        .save-btn:hover {
-            background-color: white;
-            color: #181a25; 
-        }
-
-        .cancel-btn {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background: none;
-            border: none;
-            color: white;
-            font-size: 25px;
-            cursor: pointer;
-        }
-
-        .cancel-btn:hover {
-            color: red;
-        }
+        body { font-family: 'Inter', sans-serif; background-color: #0d121e; margin: 0; padding: 0; }
+        .header { color: white; padding: 15px 15px; text-align: center; }
+        .card { color: white; padding: 20px; margin: 20px auto; border-radius: 20px; border: 2px solid white; max-width: 500px; position: relative; }
+        .profile-section { display: flex; flex-direction: column; align-items: center; text-align: center; flex: 1; }
+        .profile-section h2 { margin-bottom: 15px; }
+        .profile-img { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; cursor: pointer; transition: transform 0.2s ease-in-out; }
+        .form-group { margin-bottom: 10px; width: 100%; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 16px; color: white; }
+        .form-group input, .form-group select { width: 100%; padding: 10px; font-size: 16px; border-radius: 10px; background-color: #1a1f2e; color: white; outline: none; box-sizing: border-box; border: none; }
+        .save-btn { display: block; width: 30%; padding: 10px; font-size: 16px; font-weight: bold; background-color: #0d121e; color: white; border: 1px solid white; border-radius: 10px; margin: 20px auto 0; cursor: pointer; text-align: center; }
+        .save-btn:hover { background-color: white; color: #181a25; }
+        .cancel-btn { position: absolute; top: 20px; right: 20px; background: none; border: none; color: white; font-size: 25px; cursor: pointer; }
+        .cancel-btn:hover { color: red; }
     </style>
+
 </head>
 <body>
 <div class="header">
@@ -204,7 +117,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <div class="card">
     <button class="cancel-btn" onclick="window.location.href='profile.php'">&times;</button>
     <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" enctype="multipart/form-data">
-        <!-- Profile Picture Section with Title BELOW -->
 <div class="profile-section">
     <label for="profileInput">
         <img id="profilePreview" src="<?php echo $profile_picture ? $profile_picture : 'assets/icon.png'; ?>" alt="Profile Picture" class="profile-img">
@@ -213,8 +125,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <h2 style="margin-top: 15px; font-size: 20px;">Edit Information</h2>
 </div>
 
-
-        <!-- Editable Form Fields -->
         <div class="form-group">
             <label for="firstname">First Name:</label>
             <input type="text" id="firstname" name="firstname" value="<?php echo $firstname; ?>">
@@ -263,7 +173,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         document.getElementById("profileInput").click();
     }
 
-    // Click on profile image triggers file input
     document.getElementById("profileInput").addEventListener("change", function (event) {
         const file = event.target.files[0];
         if (file) {

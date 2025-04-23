@@ -34,7 +34,6 @@ if ($result->num_rows == 1) {
     $address = isset($user_data['address']) ? htmlspecialchars($user_data['address']) : '';
     $email = htmlspecialchars($user_data['email']);
 
-    // Fetch remaining_sessions from sit_in_records table
     $session_query = "SELECT remaining_sessions FROM sit_in_records WHERE id_no = ? ORDER BY id DESC LIMIT 1";
     $session_stmt = $conn->prepare($session_query);
     $session_stmt->bind_param("s", $id_no);
@@ -58,81 +57,22 @@ if ($result->num_rows == 1) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Profile - CCS Sit-In Monitoring System</title>
+    <title>CCS Sit-In Monitoring System</title>
     <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #0d121e;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-        }
-        .header {
-            color: white;
-            padding: 15px 20px;
-            text-align: center;
-            flex-shrink: 0;
-        }
-        .content {
-            flex-grow: 1;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-            box-sizing: border-box;
-        }
-        .card {
-            padding: 20px;
-            border-radius: 20px;
-            border: 2px solid white;
-            box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
-            max-width: 500px;
-            width: 100%;
-            position: relative;
-        }
-        .card h3 {
-            text-align: center;
-            color: white;
-        }
-        .profile-img {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            object-fit: cover;
-            margin: 0 auto 20px auto; 
-            display: block;
-        }
-        .card p, h3 {
-            text-align: left;
-            color: white;
-        }
-        .edit-btn {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background: none;
-            border: none;
-            color: white;
-            font-size: 25px;
-            cursor: pointer;
-        }
-        .edit-btn:hover {
-            color: #00bcd4; 
-        }
-         .detail-item {
-            background-color: #1a1f2e;
-            border-radius: 10px;
-            padding: 10px;
-            margin-bottom: 10px;
-        }
-        .detail-item p {
-            margin: 0;
-            color: white;
-        }
+            @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+            body { font-family: 'Inter', sans-serif; background-color: #0d121e; margin: 0; padding: 0; display: flex; flex-direction: column; height: 100vh; }
+            .header { color: white; padding: 15px 20px; text-align: center; flex-shrink: 0; }
+            .content { flex-grow: 1; display: flex; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; }
+            .card { padding: 20px; border-radius: 20px; border: 2px solid white; box-shadow: 0 0 10px rgba(255, 255, 255, 0.3); max-width: 500px; width: 100%; position: relative; }
+            .card h3 { text-align: center; color: white; }
+            .profile-img { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; margin: 0 auto 20px auto; display: block; }
+            .card p, h3 { text-align: left; color: white; }
+            .edit-btn { position: absolute; top: 20px; right: 20px; background: none; border: none; color: white; font-size: 25px; cursor: pointer; }
+            .edit-btn:hover { color: #00bcd4; }
+            .detail-item { background-color: #1a1f2e; border-radius: 10px; padding: 10px; margin-bottom: 10px; }
+            .detail-item p { margin: 0; color: white; }
     </style>
+
 </head>
 <body>
     <?php include 'includes/sidebar.php'; ?>

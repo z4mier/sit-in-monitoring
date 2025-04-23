@@ -17,87 +17,20 @@ $user = $_SESSION['user'];
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #0d121e;
-            margin: 0;
-            padding: 0;
-            color: white;
-        }
-
-        .content {
-            margin-left: 270px;
-            padding: 20px;
-            box-sizing: border-box;
-        }
-
-        .resources-wrapper {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-        }
-
-        .resources, .materials {
-            flex: 1 1 45%;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            padding: 20px;
-            border-radius: 15px;
-            border: 2px solid white;
-            background-color: #0d121e;
-            box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
-        }
-
-        .resources h3, .materials h3 {
-            font-weight: bold;
-            font-size: 20px;
-            text-align: center;
-        }
-
-        .card {
-            background-color: #212b40;
-            padding: 18px;
-            border-radius: 10px;
-            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
-            color: white;
-            border: 1px solid rgba(0, 0, 0, 0.1);
-        }
-
-        .card h4 {
-            margin: 0;
-            font-size: 18px;
-            color: #fff;
-        }
-
-        .card p {
-            font-size: 14px;
-            color: #ccc;
-            margin-top: 6px;
-            margin-bottom: 12px;
-        }
-
-        .card a {
-            color: #61dafb;
-            text-decoration: none;
-        }
-
-        .card a:hover {
-            text-decoration: underline;
-        }
-
-        @media screen and (max-width: 1024px) {
-            .resources-wrapper {
-                flex-direction: column;
-            }
-
-            .resources, .materials {
-                width: 100%;
-            }
-        }
+            @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+            body { font-family: 'Inter', sans-serif; background-color: #0d121e; margin: 0; padding: 0; color: white; }
+            .content { margin-left: 270px; padding: 20px; box-sizing: border-box; }
+            .resources-wrapper { display: flex; flex-wrap: wrap; gap: 20px; }
+            .resources, .materials { flex: 1 1 45%; display: flex; flex-direction: column; gap: 20px; padding: 20px; border-radius: 15px; border: 2px solid white; background-color: #0d121e; box-shadow: 0 0 10px rgba(255, 255, 255, 0.3); }
+            .resources h3, .materials h3 { font-weight: bold; font-size: 20px; text-align: center; }
+            .card { background-color: #212b40; padding: 18px; border-radius: 10px; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2); color: white; border: 1px solid rgba(0, 0, 0, 0.1); }
+            .card h4 { margin: 0; font-size: 18px; color: #fff; }
+            .card p { font-size: 14px; color: #ccc; margin-top: 6px; margin-bottom: 12px; }
+            .card a { color: #61dafb; text-decoration: none; }
+            .card a:hover { text-decoration: underline; }
+            @media screen and (max-width: 1024px) { .resources-wrapper { flex-direction: column; } .resources, .materials { width: 100%; } }
     </style>
+
 </head>
 <body>
 

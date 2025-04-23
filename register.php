@@ -52,66 +52,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register - CCS Sit-In Monitoring System</title>
     <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
-    body {
-             font-family: 'Inter', sans-serif;
-            background-image: url('assets/bg.jpg');
-            background-size: cover;
-            background-repeat: no-repeat;
-            background-attachment: fixed;
-            margin: 0;
-            padding: 0;
-        }
-        #frm {
-            width: 500px;
-            margin: 100px auto;
-            padding: 40px;
-            background-color: rgba(255, 255, 255, 0.6);
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            border-radius: 10px;
-        }
-        h1 {
-            text-align: center;
-            font-size: 24px;
-            margin-bottom: 20px;
-        }
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-        input[type="text"], input[type="password"], select {
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 10px;
-            border: 1px solid #ccc;
-            border-radius: 25px;
-            box-sizing: border-box;
-            font-size: 16px;
-            background-color: #f7f7f7;
-        }
-        input[type="submit"] {
-            width: 100%;
-            background-color: #144d94;
-            color: white;
-            padding: 10px;
-            border: none;
-            border-radius: 25px;
-            cursor: pointer;
-            font-size: 15px;
-        }
-        input[type="submit"]:hover {
-            background-color: #113d74;
-        }
-        p {
-            text-align: center;
-            font-size: 15px;
-        }
-        a {
-            color: #144d94;
-            text-decoration: none;
-        }
+            @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+            body { font-family: 'Inter', sans-serif; background-image: url('assets/bg.jpg'); background-size: cover; background-repeat: no-repeat; background-attachment: fixed; margin: 0; padding: 0; }
+            #frm { width: 500px; margin: 100px auto; padding: 40px; background-color: rgba(255, 255, 255, 0.6); box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); border-radius: 10px; }
+            h1 { text-align: center; font-size: 24px; margin-bottom: 20px; }
+            label { display: block; margin-bottom: 5px; font-weight: bold; }
+            input[type="text"], input[type="password"], select { width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 25px; box-sizing: border-box; font-size: 16px; background-color: #f7f7f7; }
+            input[type="submit"] { width: 100%; background-color: #144d94; color: white; padding: 10px; border: none; border-radius: 25px; cursor: pointer; font-size: 15px; }
+            input[type="submit"]:hover { background-color: #113d74; }
+            p { text-align: center; font-size: 15px; }
+            a { color: #144d94; text-decoration: none; }
     </style>
+
 </head>
 <body>
     <div id="frm">
