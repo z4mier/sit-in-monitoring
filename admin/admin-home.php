@@ -46,106 +46,26 @@ $conn->close();
     <title>Admin Home</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <style>
-        body {
-            margin: 0;
-            font-family: 'Inter', sans-serif;
-            display: flex;
-            background-color: #0d121e;
-            color: #ffffff;
-        }
-        .main-content {
-            margin-left: 80px;
-            padding: 20px;
-            transition: margin-left 0.3s;
-            flex: 1;
-        }
+        body { margin: 0; font-family: 'Inter', sans-serif; display: flex; background-color: #0d121e; color: #ffffff; }
+        .main-content { margin-left: 80px; padding: 20px; transition: margin-left 0.3s; flex: 1; }
+        .sidebar:hover ~ .main-content { margin-left: 180px; }
+        header { display: flex; justify-content: space-between; align-items: center; padding: 20px; border-bottom: 2px solid #333; }
+        header h1 { margin: 0; color: white; font-size: 30px; }
+        .overview { display: flex; justify-content: center; gap: 20px; margin-top: 30px; }
+        .card { width: 220px; padding: 15px; background-color: #212b40; border-radius: 10px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); text-align: center; color: white; }
+        .card-header { display: flex; align-items: center; justify-content: center; gap: 8px; text-align: center; }
+        .card-header i { font-size: 18px; color: white; }
+        .overview .card h3 { margin-bottom: 10px; font-weight: 400; font-size: 15px; }
+        .overview .card p { margin: 0; font-size: 25px; font-weight: bold; }
+        .chart-container { margin-top: 20px; text-align: left; }
+        .chart-container h2 { color: white; font-size: 25px; margin-bottom: 20px; }
+        #purposeChart { width: 100% !important; height: 500px !important; max-width: 100%; display: block; margin: 0; background-color: #1a2336; padding: 10px; border-radius: 10px; }
+</style>
 
-        .sidebar:hover ~ .main-content {
-            margin-left: 180px;
-        }
-                
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px;
-            border-bottom: 2px solid #333;
-        }
-
-        header h1 {
-            margin: 0;
-            color: white;
-            font-size: 30px;
-        }
-
-        .overview {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            margin-top: 30px;
-        }
-
-        .card {
-            width: 220px; 
-            padding: 15px;
-            background-color: #212b40;
-            border-radius: 10px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            color: white;
-        }
-
-        .card-header {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            text-align: center;
-        }
-
-        .card-header i {
-            font-size: 18px; 
-            color: white;
-        }
-
-        .overview .card h3 {
-            margin-bottom: 10px;
-            font-weight: 400;
-            font-size: 15px;
-        }
-
-        .overview .card p {
-            margin: 0;
-            font-size: 25px;
-            font-weight: bold;
-        }
-
-        .chart-container {
-            margin-top: 20px;
-            text-align: left;
-        }
-
-        .chart-container h2 {
-            color: white;
-            font-size: 25px;
-            margin-bottom: 20px;
-        }
-
-        #purposeChart {
-            width: 100% !important; 
-            height: 500px !important;
-            max-width: 100%;
-            display: block;
-            margin: 0;
-            background-color: #1a2336;
-            padding: 10px;
-            border-radius: 10px;
-        }
-    </style>
 </head>
 <body>
-    <!-- Include Sidebar -->
     <?php include '../includes/admin-sidebar.php'; ?>
 
     <div class="main-content">
@@ -153,7 +73,6 @@ $conn->close();
             <h1>Admin - Dashboard</h1>
         </header>
 
-        <!-- Overview Section -->
         <section class="overview">
             <div class="card">
                 <div class="card-header">
@@ -180,7 +99,6 @@ $conn->close();
             </div>
         </section>
 
-        <!-- Chart Section -->
         <section class="chart-container">
             <h2>Statistics</h2>
             <canvas id="purposeChart"></canvas>

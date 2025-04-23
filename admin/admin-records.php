@@ -131,7 +131,7 @@ $conn->close();
       notif.style.opacity = "0";
       setTimeout(() => notif.remove(), 600);
     }
-  }, 3000); // Auto-hide after 3 seconds
+  }, 3000); 
 </script>
 <?php endif; ?>
 

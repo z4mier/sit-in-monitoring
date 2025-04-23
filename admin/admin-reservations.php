@@ -4,7 +4,7 @@ include '../includes/db-connection.php';
 
 $search = $_GET['search'] ?? '';
 $status_filter = $_GET['status'] ?? '';
-$sort_order = $_GET['sort'] ?? 'DESC'; // Default to Newest to Oldest
+$sort_order = $_GET['sort'] ?? 'DESC'; 
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
 $rows_per_page = isset($_GET['limit']) ? (int)$_GET['limit'] : 10;
 $offset = ($page - 1) * $rows_per_page;
@@ -64,7 +64,6 @@ if ($result && $result->num_rows > 0) {
 $conn->close();
 ?>
 
-<!-- HTML START -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -72,148 +71,37 @@ $conn->close();
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin - Reservation Approval</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+ 
   <style>
-    body {
-      margin: 0;
-      font-family: 'Inter', sans-serif;
-      background-color: #0d121e;
-      color: white;
-      display: flex;
-    }
-    .main-content {
-      margin-left: 80px !important;
-      padding: 20px;
-      flex: 1;
-    }
-    .sidebar:hover ~ .main-content {
-      margin-left: 180px !important;
-    }
-    thead tr {
-      background-color: transparent !important;
-    }
-    .custom-toast {
-      background-color: #1f2937;
-      color: white;
-      padding: 14px 20px;
-      border-radius: 10px;
-      font-size: 15px;
-      margin-bottom: 15px;
-      animation: fadeIn 0.3s ease;
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(-10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    header {
-      padding: 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: start;
-      flex-wrap: wrap;
-      border-bottom: 2px solid #333;
-    }
-    header h1 {
-      font-size: 28px;
-      margin: 0 0 15px 0;
-    }
-    header form {
-      display: flex;
-      gap: 10px;
-    }
-    select, input[type="text"] {
-      padding: 10px;
-      border-radius: 6px;
-      font-size: 14px;
-      border: none;
-      background-color: white;
-      color: black;
-    }
-    input[type="text"] {
-      width: 200px;
-    }
-    .search-bar {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-top: 5px;
-    }
-    .search-bar input {
-      padding: 10px 40px 10px 15px;
-      border-radius: 999px;
-      border: none;
-      width: 250px;
-      background-color: white;
-      color: black;
-    }
-    .search-bar button {
-      position: absolute;
-      top: 50%;
-      right: 12px;
-      transform: translateY(-50%);
-      background: none;
-      border: none;
-      cursor: pointer;
-    }
-    .search-bar i {
-      color: black;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 20px;
-    }
-    th, td {
-      padding: 15px;
-      text-align: center;
-    }
-    table tr:nth-child(even) { background-color: #111524; }
-    table tr:nth-child(odd) { background-color: #212b40; }
-    table tr:hover { background-color: #181a25; }
-    .status {
-      padding: 6px 10px;
-      border-radius: 12px;
-      font-weight: 600;
-    }
-    .approved, .pending, .rejected {
-      color: white;
-    }
-    .approve-btn, .reject-btn {
-      background-color: transparent;
-      color: white;
-      border: 1px solid #555;
-      padding: 6px 10px;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-    .pagination-wrapper {
-      display: flex;
-      justify-content: flex-end;
-      align-items: center;
-      gap: 15px;
-      padding-top: 15px;
-      font-size: 14px;
-    }
-    .pagination-wrapper select {
-      background-color: #212b40;
-      color: white;
-      border: 1px solid #555;
-      border-radius: 4px;
-      padding: 5px 8px;
-    }
-    .nav-buttons button {
-      background-color: #212b40;
-      color: white;
-      border: none;
-      padding: 6px 10px;
-      margin-left: 5px;
-      cursor: pointer;
-      font-size: 16px;
-      border-radius: 4px;
-    }
-    .nav-buttons button:hover {
-      background-color: #2e3b5e;
-    }
+      body { margin: 0; font-family: 'Inter', sans-serif; background-color: #0d121e; color: white; display: flex; }
+      .main-content { margin-left: 80px !important; padding: 20px; flex: 1; }
+      .sidebar:hover ~ .main-content { margin-left: 180px !important; }
+      thead tr { background-color: transparent !important; }
+      .custom-toast { background-color: #1f2937; color: white; padding: 14px 20px; border-radius: 10px; font-size: 15px; margin-bottom: 15px; animation: fadeIn 0.3s ease; }
+      @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+      header { padding: 20px; display: flex; justify-content: space-between; align-items: start; flex-wrap: wrap; border-bottom: 2px solid #333; }
+      header h1 { font-size: 28px; margin: 0 0 15px 0; }
+      header form { display: flex; gap: 10px; }
+      select, input[type="text"] { padding: 10px; border-radius: 6px; font-size: 14px; border: none; background-color: white; color: black; }
+      input[type="text"] { width: 200px; }
+      .search-bar { display: flex; align-items: center; gap: 10px; margin-top: 5px; }
+      .search-bar input { padding: 10px 40px 10px 15px; border-radius: 999px; border: none; width: 250px; background-color: white; color: black; }
+      .search-bar button { position: absolute; top: 50%; right: 12px; transform: translateY(-50%); background: none; border: none; cursor: pointer; }
+      .search-bar i { color: black; }
+      table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+      th, td { padding: 15px; text-align: center; }
+      table tr:nth-child(even) { background-color: #111524; }
+      table tr:nth-child(odd) { background-color: #212b40; }
+      table tr:hover { background-color: #181a25; }
+      .status { padding: 6px 10px; border-radius: 12px; font-weight: 600; }
+      .approved, .pending, .rejected { color: white; }
+      .approve-btn, .reject-btn { background-color: transparent; color: white; border: 1px solid #555; padding: 6px 10px; border-radius: 5px; cursor: pointer; }
+      .pagination-wrapper { display: flex; justify-content: flex-end; align-items: center; gap: 15px; padding-top: 15px; font-size: 14px; }
+      .pagination-wrapper select { background-color: #212b40; color: white; border: 1px solid #555; border-radius: 4px; padding: 5px 8px; }
+      .nav-buttons button { background-color: #212b40; color: white; border: none; padding: 6px 10px; margin-left: 5px; cursor: pointer; font-size: 16px; border-radius: 4px; }
+      .nav-buttons button:hover { background-color: #2e3b5e; }
   </style>
+
 </head>
 <body>
 

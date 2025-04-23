@@ -53,86 +53,26 @@ $conn->close();
   <title>Admin - Feedback Reports</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"/>
+
   <style>
-    body {
-      margin: 0;
-      font-family: 'Inter', sans-serif;
-      background-color: #0d121e;
-      color: #ffffff;
-      display: flex;
-    }
-    .main-content {
-      margin-left: 80px;
-      padding: 20px;
-      flex: 1;
-    }
-    .sidebar:hover ~ .main-content {
-      margin-left: 180px;
-    }
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 20px;
-      border-bottom: 2px solid #333;
-    }
-    h1 {
-      margin: 0;
-      font-size: 28px;
-    }
-    .table-container {
-      margin-top: 20px;
-      padding: 20px;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-    table th, table td {
-      padding: 15px;
-      text-align: center;
-    }
-    thead tr {
-      background-color: transparent !important;
-    }
-    table tr:nth-child(even) {
-      background-color: #111524;
-    }
-    table tr:nth-child(odd) {
-      background-color: #212b40;
-    }
-    table tr:hover {
-      background-color: #181a25;
-    }
-    .pagination-wrapper {
-      display: flex;
-      justify-content: flex-end;
-      align-items: center;
-      gap: 15px;
-      padding-top: 15px;
-      font-size: 14px;
-    }
-    .pagination-wrapper select {
-      background-color: #212b40;
-      color: white;
-      border: 1px solid #555;
-      border-radius: 4px;
-      padding: 5px 8px;
-    }
-    .nav-buttons button {
-      background-color: #212b40;
-      color: white;
-      border: none;
-      padding: 6px 10px;
-      margin-left: 5px;
-      cursor: pointer;
-      font-size: 16px;
-      border-radius: 4px;
-    }
-    .nav-buttons button:hover {
-      background-color: #2e3b5e;
-    }
-  </style>
+      body { margin: 0; font-family: 'Inter', sans-serif; background-color: #0d121e; color: #ffffff; display: flex; }
+      .main-content { margin-left: 80px; padding: 20px; flex: 1; }
+      .sidebar:hover ~ .main-content { margin-left: 180px; }
+      header { display: flex; justify-content: space-between; align-items: center; padding: 20px; border-bottom: 2px solid #333; }
+      h1 { margin: 0; font-size: 28px; }
+      .table-container { margin-top: 20px; padding: 20px; }
+      table { width: 100%; border-collapse: collapse; }
+      table th, table td { padding: 15px; text-align: center; }
+      thead tr { background-color: transparent !important; }
+      table tr:nth-child(even) { background-color: #111524; }
+      table tr:nth-child(odd) { background-color: #212b40; }
+      table tr:hover { background-color: #181a25; }
+      .pagination-wrapper { display: flex; justify-content: flex-end; align-items: center; gap: 15px; padding-top: 15px; font-size: 14px; }
+      .pagination-wrapper select { background-color: #212b40; color: white; border: 1px solid #555; border-radius: 4px; padding: 5px 8px; }
+      .nav-buttons button { background-color: #212b40; color: white; border: none; padding: 6px 10px; margin-left: 5px; cursor: pointer; font-size: 16px; border-radius: 4px; }
+      .nav-buttons button:hover { background-color: #2e3b5e; }
+</style>
+
 </head>
 <body>
 

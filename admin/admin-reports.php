@@ -78,142 +78,34 @@ $conn->close();
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
 
-  <style>
-    body {
-      margin: 0;
-      font-family: 'Inter', sans-serif;
-      background-color: #0d121e;
-      color: #ffffff;
-      display: flex;
-    }
-    .main-content {
-      margin-left: 80px;
-      padding: 20px;
-      flex: 1;
-    }
-    .sidebar:hover ~ .main-content {
-      margin-left: 180px;
-    }
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 20px;
-    }
-    h1 {
-      margin: 0;
-      font-size: 28px;
-    }
-    .search-container {
-      position: relative;
-      display: flex;
-      align-items: center;
-    }
-    .search-container input[type="text"] {
-      padding: 10px 40px 10px 15px;
-      border-radius: 25px;
-      width: 240px;
-      background-color: white;
-      color: black;
-      border: 2px solid #ffffff;
-    }
-    .search-container .search-icon {
-      position: absolute;
-      right: 15px;
-      color: black;
-      pointer-events: none;
-    }
-    .top-controls {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin: 0 20px 10px;
-      gap: 10px;
-    }
-    .filter-tools {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
-    .filter-tools select,
-    .filter-tools a {
-      padding: 6px 12px;
-      font-size: 14px;
-      border: none;
-      border-radius: 5px;
-    }
-    .filter-tools a {
-      background-color: white;
-      color: black;
-      text-decoration: none;
-      display: flex;
-      align-items: center;
-    }
-    .export-buttons {
-      display: flex;
-      gap: 15px;
-    }
-    .export-buttons button {
-      background-color: #f1f1f1;
-      border: none;
-      padding: 8px;
-      border-radius: 5px;
-      cursor: pointer;
-      color: #111;
-    }
-    .export-buttons button i {
-      font-size: 20px;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-    th, td {
-      padding: 12px;
-      text-align: center;
-    }
-    thead tr {
-      background-color: transparent !important;
-    }
-    tbody tr:nth-child(even) {
-      background-color: #111524;
-    }
-    tbody tr:nth-child(odd) {
-      background-color: #212b40;
-    }
-    tbody tr:hover {
-      background-color: #181a25;
-    }
-      .pagination-wrapper {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    gap: 15px;
-    padding-top: 15px;
-    font-size: 14px;
-  }
-  .pagination-wrapper select {
-    background-color: #212b40;
-    color: white;
-    border: 1px solid #555;
-    border-radius: 4px;
-    padding: 5px 8px;
-  }
-  .nav-buttons button {
-    background-color: #212b40;
-    color: white;
-    border: none;
-    padding: 6px 10px;
-    margin-left: 5px;
-    cursor: pointer;
-    font-size: 16px;
-    border-radius: 4px;
-  }
-  .nav-buttons button:hover {
-    background-color: #2e3b5e;
-  }
+<style>
+      body { margin: 0; font-family: 'Inter', sans-serif; background-color: #0d121e; color: #ffffff; display: flex; }
+      .main-content { margin-left: 80px; padding: 20px; flex: 1; }
+      .sidebar:hover ~ .main-content { margin-left: 180px; }
+      header { display: flex; justify-content: space-between; align-items: center; padding: 20px; }
+      h1 { margin: 0; font-size: 28px; }
+      .search-container { position: relative; display: flex; align-items: center; }
+      .search-container input[type="text"] { padding: 10px 40px 10px 15px; border-radius: 25px; width: 240px; background-color: white; color: black; border: 2px solid #ffffff; }
+      .search-container .search-icon { position: absolute; right: 15px; color: black; pointer-events: none; }
+      .top-controls { display: flex; justify-content: space-between; align-items: center; margin: 0 20px 10px; gap: 10px; }
+      .filter-tools { display: flex; flex-wrap: wrap; gap: 10px; }
+      .filter-tools select, .filter-tools a { padding: 6px 12px; font-size: 14px; border: none; border-radius: 5px; }
+      .filter-tools a { background-color: white; color: black; text-decoration: none; display: flex; align-items: center; }
+      .export-buttons { display: flex; gap: 15px; }
+      .export-buttons button { background-color: #f1f1f1; border: none; padding: 8px; border-radius: 5px; cursor: pointer; color: #111; }
+      .export-buttons button i { font-size: 20px; }
+      table { width: 100%; border-collapse: collapse; }
+      th, td { padding: 12px; text-align: center; }
+      thead tr { background-color: transparent !important; }
+      tbody tr:nth-child(even) { background-color: #111524; }
+      tbody tr:nth-child(odd) { background-color: #212b40; }
+      tbody tr:hover { background-color: #181a25; }
+      .pagination-wrapper { display: flex; justify-content: flex-end; align-items: center; gap: 15px; padding-top: 15px; font-size: 14px; }
+      .pagination-wrapper select { background-color: #212b40; color: white; border: 1px solid #555; border-radius: 4px; padding: 5px 8px; }
+      .nav-buttons button { background-color: #212b40; color: white; border: none; padding: 6px 10px; margin-left: 5px; cursor: pointer; font-size: 16px; border-radius: 4px; }
+      .nav-buttons button:hover { background-color: #2e3b5e; }
+</style>
 
-  </style>
 </head>
 <body>
 
@@ -427,7 +319,5 @@ function goToLastPage() {
 
 window.onload = displayPage;
 </script>
-
-
 </body>
 </html>

@@ -127,7 +127,6 @@ if ($result && $result->num_rows > 0) {
 $conn->close();
 ?>
 
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -135,149 +134,37 @@ $conn->close();
   <title>Admin - Current Sit-In</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"/>
+
   <style>
-    body {
-      margin: 0;
-      font-family: 'Inter', sans-serif;
-      display: flex;
-      background-color: #0d121e;
-      color: #ffffff;
-    }
-    .main-content {
-      margin-left: 80px;
-      padding: 20px;
-      flex: 1;
-    }
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 20px;
-      border-bottom: 2px solid #333;
-    }
-    .sidebar:hover ~ .main-content {
-            margin-left: 180px;
-        }
-    .table-container {
-      margin-top: 20px;
-      border-radius: 10px;
-      padding: 20px;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-    table th, table td {
-      padding: 15px;
-      text-align: center;
+      body { margin: 0; font-family: 'Inter', sans-serif; display: flex; background-color: #0d121e; color: #ffffff; }
+      .main-content { margin-left: 80px; padding: 20px; flex: 1; }
+      header { display: flex; justify-content: space-between; align-items: center; padding: 20px; border-bottom: 2px solid #333; }
+      .sidebar:hover ~ .main-content { margin-left: 180px; }
+      .table-container { margin-top: 20px; border-radius: 10px; padding: 20px; }
+      table { width: 100%; border-collapse: collapse; }
+      table th, table td { padding: 15px; text-align: center; }
+      thead tr { background-color: transparent !important; }
+      table td { text-align: center; }
+      table tr:nth-child(even) { background-color: #111524; }
+      table tr:nth-child(odd) { background-color: #212b40; }
+      table tr:hover { background-color: #181a25; }
+      td:last-child { position: relative; text-align: center; }
+      .logout-btn { background-color: white; color: #333; border: none; padding: 10px; cursor: pointer; border-radius: 20px; font-weight: bold; }
+      .logout-btn:hover { background-color: whitesmoke; }
+      .notification { display: none; position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background-color: #181a25; color: white; padding: 15px 25px; border-radius: 20px; font-size: 15px; z-index: 1000; text-align: center; opacity: 0; transition: opacity 0.5s ease-in-out; display: flex; align-items: center; gap: 10px; }
+      .notification.show { display: flex; opacity: 1; }
+      .notification i { font-size: 15px; }
+      .notification.success i { color: #4ade80; }
+      .notification.error i { color: #f87171; }
+      .sort-arrow { margin-left: 5px; transition: transform 0.3s; }
+      .sort-arrow.asc { transform: rotate(180deg); }
+      td:nth-child(1) { text-align: left; padding-left: 70px; }
+      .pagination-wrapper { display: flex; justify-content: flex-end; align-items: center; gap: 15px; padding-top: 15px; font-size: 14px; }
+      .pagination-wrapper select { background-color: #212b40; color: white; border: 1px solid #555; border-radius: 4px; padding: 5px 8px; }
+      .nav-buttons button { background-color: #212b40; color: white; border: none; padding: 6px 10px; margin-left: 5px; cursor: pointer; font-size: 16px; border-radius: 4px; }
+      .nav-buttons button:hover { background-color: #2e3b5e; }
+</style>
 
-    }
-    thead tr {
-  background-color: transparent !important;
-}
-
-    table td {
-            text-align: center;
-        }
-    table tr:nth-child(even) {
-      background-color: #111524;
-    }
-    table tr:nth-child(odd) {
-      background-color: #212b40;
-    }
-    table tr:hover {
-      background-color: #181a25;
-    }
-    td:last-child {
-            position: relative;
-            text-align: center;
-        }
-
-    .logout-btn {
-      background-color: white;
-      color: #333;
-      border: none;
-      padding: 10px;
-      cursor: pointer;
-      border-radius: 20px;
-      font-weight: bold;
-    }
-    .logout-btn:hover {
-      background-color: whitesmoke;
-    }
-    .notification {
-      display: none;
-      position: fixed;
-      top: 20px; 
-      left: 50%;
-      transform: translateX(-50%); 
-      background-color: #181a25; 
-      color: white;
-      padding: 15px 25px;
-      border-radius: 20px;
-      font-size: 15px;
-      z-index: 1000;
-      text-align: center;
-      opacity: 0;
-      transition: opacity 0.5s ease-in-out;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .notification.show {
-      display: flex;
-      opacity: 1;
-    }
-    .notification i {
-      font-size: 15px;
-    }
-    .notification.success i {
-      color: #4ade80;
-    }
-    .notification.error i {
-      color: #f87171;
-    }
-    .sort-arrow {
-      margin-left: 5px;
-      transition: transform 0.3s;
-    }
-    .sort-arrow.asc {
-      transform: rotate(180deg);
-    }
-    td:nth-child(1) {
-      text-align: left;
-      padding-left: 70px;
-    }
-      .pagination-wrapper {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    gap: 15px;
-    padding-top: 15px;
-    font-size: 14px;
-  }
-  .pagination-wrapper select {
-    background-color: #212b40;
-    color: white;
-    border: 1px solid #555;
-    border-radius: 4px;
-    padding: 5px 8px;
-  }
-  .nav-buttons button {
-    background-color: #212b40;
-    color: white;
-    border: none;
-    padding: 6px 10px;
-    margin-left: 5px;
-    cursor: pointer;
-    font-size: 16px;
-    border-radius: 4px;
-  }
-  .nav-buttons button:hover {
-    background-color: #2e3b5e;
-  }
-
-  </style>
 </head>
 <body>
 
@@ -330,8 +217,6 @@ $conn->close();
   </div>
 </div>
 
-
-<!-- ✅ Dynamic Notification -->
 <div id="successNotification" class="notification <?= $notification_type ?>">
   <i class="<?= $notification_type === 'success' ? 'fas fa-check-circle' : 'fas fa-times-circle' ?>"></i>
   <span id="notificationMessage"><?= $notification_message ?></span>
@@ -339,7 +224,6 @@ $conn->close();
 
 <script>
 document.addEventListener("DOMContentLoaded", function () {
-    // Sort by Sit-In #
     let ascending = true;
     document.getElementById("sortSitInNumber").addEventListener("click", function () {
         const table = document.getElementById("sitInTable");
@@ -360,7 +244,7 @@ document.addEventListener("DOMContentLoaded", function () {
         rows.forEach(row => table.appendChild(row));
     });
 
-    // Show Notification if Message Exists
+
     const message = <?= json_encode($notification_message) ?>;
     const type = <?= json_encode($notification_type) ?>;
     if (message) {
