@@ -1,4 +1,5 @@
 <?php
+session_start();
 include '../includes/db-connection.php';
 $selected_lab = $_GET['lab'] ?? '';
 $pcs = [];
@@ -38,6 +39,10 @@ if ($resResult && $resResult->num_rows > 0) {
     $reservations[] = $row;
   }
 }
+
+$notification_message = $_SESSION['notification_message'] ?? '';
+$notification_type = $_SESSION['notification_type'] ?? '';
+unset($_SESSION['notification_message'], $_SESSION['notification_type']);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -69,6 +74,29 @@ if ($resResult && $resResult->num_rows > 0) {
     .reservation-empty { text-align: center; color: #888; margin-top: 100px; }
     .submit-btn { margin-top: 15px; width: 100%; padding: 12px; background-color: #212b40; color: white; border: none; border-radius: 20px; cursor: pointer; font-size: 15px; }
     .action-btn { padding: 5px 10px; border: none; border-radius: 10px; cursor: pointer; margin: 0 5px; }
+
+    .notification {
+      display: none;
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: #181a25;
+      color: white;
+      padding: 15px 20px;
+      border-radius: 20px;
+      font-size: 14px;
+      z-index: 1000;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .notification.show { display: flex; opacity: 1; }
+    .notification.success i { color: #4ade80; }
+    .notification.error i { color: #f87171; }
+
     input[type="checkbox"] { display: none; }
     input[type="checkbox"]:checked + .pc-tile { opacity: 0.5; }
   </style>
@@ -78,6 +106,12 @@ if ($resResult && $resResult->num_rows > 0) {
 <div class="main-content">
   <div style="padding-bottom: 20px; border-bottom: 2px solid #333; margin-bottom: 20px;">
     <h1>Reservation Controls</h1>
+    <a href="admin-reservation-logs.php">
+  <button style="margin-top: 10px; padding: 10px 18px; font-size: 15px; border-radius: 8px; background-color: white; color: 212b40; border: none; cursor: pointer;">
+    View Reservation Logs
+  </button>
+</a>
+
   </div>
   <div class="dashboard-row">
     <div class="form-box">
@@ -123,9 +157,7 @@ if ($resResult && $resResult->num_rows > 0) {
       <h3><i class="fas fa-clock"></i> Reservation Request</h3>
       <?php if (!empty($reservations)): ?>
         <?php foreach ($reservations as $res): ?>
-          <?php
-            $full_name = trim($res['firstname'] . ' ' . $res['middlename'] . ' ' . $res['lastname']);
-          ?>
+          <?php $full_name = trim($res['firstname'] . ' ' . $res['middlename'] . ' ' . $res['lastname']); ?>
           <div style="border: 1px solid #333; border-radius: 15px; padding: 20px; margin-bottom: 20px; background-color: #161d31;">
             <div style="display: grid; grid-template-columns: repeat(4, 1fr); row-gap: 12px; column-gap: 15px;">
               <div><strong>ID No.:</strong> <?= htmlspecialchars($res['id_no']) ?></div>
@@ -157,5 +189,21 @@ if ($resResult && $resResult->num_rows > 0) {
     </div>
   </div>
 </div>
+
+<div id="notification" class="notification <?= $notification_type ?>">
+  <i class="<?= $notification_type === 'success' ? 'fas fa-check-circle' : 'fas fa-times-circle' ?>"></i>
+  <span><?= htmlspecialchars($notification_message) ?></span>
+</div>
+
+<script>
+  const notifBox = document.getElementById('notification');
+  const shouldShow = <?= json_encode((bool)$notification_message) ?>;
+  if (shouldShow) {
+    notifBox.classList.add('show');
+    setTimeout(() => {
+      notifBox.classList.remove('show');
+    }, 3000);
+  }
+</script>
 </body>
 </html>

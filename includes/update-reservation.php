@@ -8,14 +8,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (!empty($reservation_id) && in_array($action, ['Approved', 'Rejected'])) {
         // Update reservation status
-        $stmt = $conn->prepare("UPDATE reservations SET status = ? WHERE id = ?");
+        $stmt = $conn->prepare("UPDATE reservations SET status = ?, status_updated_at = NOW() WHERE id = ?");
         $stmt->bind_param("si", $action, $reservation_id);
         $stmt->execute();
 
         if ($stmt->affected_rows > 0) {
             // If approved, mark the selected PC as Used
             if ($action === 'Approved') {
-                // Fetch PC and Lab info for this reservation
                 $info_stmt = $conn->prepare("SELECT selected_pc, lab_number FROM reservations WHERE id = ?");
                 $info_stmt->bind_param("i", $reservation_id);
                 $info_stmt->execute();
@@ -34,16 +33,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
             }
 
-            $_SESSION['notification_message'] = "Reservation status updated to $action.";
+            $_SESSION['notification_message'] = "Reservation has been {$action}.";
+            $_SESSION['notification_type'] = $action === 'Approved' ? 'success' : 'error';
         } else {
             $_SESSION['notification_message'] = "Failed to update reservation.";
+            $_SESSION['notification_type'] = "error";
         }
     } else {
         $_SESSION['notification_message'] = "Invalid action or reservation ID.";
+        $_SESSION['notification_type'] = "error";
     }
-}
 
-$_SESSION['success'] = "Reservation updated!";
-header("Location: " . $_SERVER['HTTP_REFERER']);
-exit;
+    header("Location: " . $_SERVER['HTTP_REFERER']);
+    exit;
+}
 ?>

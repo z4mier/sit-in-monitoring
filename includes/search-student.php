@@ -27,7 +27,6 @@ $course = $row['course'];
 $year = $row['yr_level'];
 ?>
 
-<!-- ✅ MODAL STYLE -->
 <style>
 .modal {
     display: flex;
@@ -37,49 +36,66 @@ $year = $row['yr_level'];
     left: 0;
     width: 100%;
     height: 100%;
-    padding-top: 70px;
+    padding: 30px 15px;
     background-color: rgba(0, 0, 0, 0.6);
     justify-content: center;
-    align-items: flex-start;
+    align-items: center;
+    overflow: auto;
 }
+
 .modal-content {
     background-color: #0d121e;
     padding: 25px;
     border-radius: 10px;
-    width: 95%;
-    max-width: 500px;
+    width: 100%;
+    max-width: 550px;
+    max-height: 95vh;
+    overflow-y: scroll;
+    box-sizing: border-box;
     animation: fadeIn 0.4s ease-in-out;
     box-shadow: 0px 5px 15px rgba(0,0,0,0.4);
+    scrollbar-width: none; 
 }
+.modal-content::-webkit-scrollbar {
+    display: none;
+}
+
 .modal-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     border-bottom: 2px solid #333;
+    padding-bottom: 10px;
 }
+
 .modal-header h2 {
     margin: 0;
     font-size: 1.5rem;
     color: white;
 }
+
 .close {
     font-size: 1.5rem;
     cursor: pointer;
     color: #aaa;
 }
+
 .close:hover {
     color: #ff5c5c;
 }
+
 .modal-body form {
     display: flex;
     flex-direction: column;
     gap: 15px;
     margin-top: 20px;
 }
+
 .modal-body label {
     font-weight: bold;
     color: white;
 }
+
 .modal-body input,
 .modal-body select {
     width: 100%;
@@ -89,10 +105,12 @@ $year = $row['yr_level'];
     background-color: #212b40;
     color: white;
 }
+
 .modal-body select option {
     background-color: #212b40;
     color: white;
 }
+
 .modal-footer {
     display: flex;
     justify-content: flex-end;
@@ -101,6 +119,7 @@ $year = $row['yr_level'];
     padding-top: 10px;
     margin-top: 15px;
 }
+
 .btn-sit-in,
 .btn-close {
     padding: 10px 15px;
@@ -109,27 +128,38 @@ $year = $row['yr_level'];
     font-size: 1rem;
     cursor: pointer;
 }
+
 .btn-sit-in {
     background-color: #007bff;
     color: white;
 }
+
 .btn-sit-in:hover {
     background-color: #0056b3;
 }
+
 .btn-close {
     background-color: #f44336;
     color: white;
 }
+
 .btn-close:hover {
     background-color: #d32f2f;
 }
+
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(-20px); }
     to   { opacity: 1; transform: translateY(0); }
 }
+
+@media (max-height: 600px) {
+    .modal-content {
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+}
 </style>
 
-<!-- ✅ MODAL OUTPUT -->
 <div class="modal" id="sitInModal">
     <div class="modal-content">
         <div class="modal-header">
@@ -138,7 +168,6 @@ $year = $row['yr_level'];
         </div>
         <div class="modal-body">
             <form action="admin-current.php" method="POST">
-                <!-- Hidden values for processing -->
                 <input type="hidden" name="id_no" value="<?= htmlspecialchars($id) ?>">
                 <input type="hidden" name="name" value="<?= htmlspecialchars($fullname) ?>">
                 <input type="hidden" name="remaining_sessions" value="<?= htmlspecialchars($sessions) ?>">

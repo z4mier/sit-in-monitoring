@@ -57,17 +57,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_reservation'])
     $date = $_POST['date'] ?? '';
     $selected_pc = $_POST['selected_pc'] ?? '';
 
+    if (empty($selected_pc)) {
+        $_SESSION['notification_message'] = "You must select a PC before submitting.";
+        $_SESSION['notification_type'] = "error";
+        header("Location: reservation.php?lab=" . urlencode($lab_number));
+        exit();
+    }
+
     if (!empty($lab_number) && !empty($purpose) && !empty($time_in) && !empty($date) && !empty($selected_pc)) {
-      $stmt = $conn->prepare("INSERT INTO reservations (id_no, name, lab_number, purpose, date, time_in, selected_pc, status) VALUES (?, ?, ?, ?, ?, ?, ?, 'Pending')");
-      $stmt->bind_param("sssssss", $id_no, $full_name, $lab_number, $purpose, $date, $time_in, $selected_pc);
-      
+        $stmt = $conn->prepare("INSERT INTO reservations (id_no, name, lab_number, purpose, date, time_in, selected_pc, status) VALUES (?, ?, ?, ?, ?, ?, ?, 'Pending')");
+        $stmt->bind_param("sssssss", $id_no, $full_name, $lab_number, $purpose, $date, $time_in, $selected_pc);
         $stmt->execute();
 
         $update = $conn->prepare("UPDATE lab_pc_status SET status = 'Used' WHERE lab_number = ? AND pc_number = ?");
         $update->bind_param("ss", $lab_number, $selected_pc);
         $update->execute();
+
+        $_SESSION['notification_message'] = "Reservation submitted successfully!";
+        $_SESSION['notification_type'] = "success";
+        header("Location: reservation.php");
+        exit();
     }
 }
+
+$notification_message = $_SESSION['notification_message'] ?? '';
+$notification_type = $_SESSION['notification_type'] ?? '';
+unset($_SESSION['notification_message'], $_SESSION['notification_type']);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -88,7 +103,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_reservation'])
     .form-box h3, .table-box h3 {
       text-align: center; font-size: 20px; margin-bottom: 15px;
     }
-    .form-box h3 i, .table-box h3 i { margin-right: 10px; }
     form label { display: block; margin: 10px 0 5px; }
     form select, form input[type="date"], form input[type="time"] {
       width: 100%; padding: 10px; border-radius: 20px; border: none; font-size: 14px;
@@ -112,12 +126,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_reservation'])
       border-radius: 15px; text-align: center;
       padding: 12px; cursor: pointer; font-weight: bold;
     }
-    .available {
-      background-color: #0d121e; color: white; border: 2px solid #34d399;
-    }
-    .used {
-      background-color: #0d121e; color: white; border: 2px solid #f87171;
-    }
+    .available { background-color: #0d121e; color: white; border: 2px solid #34d399; }
+    .used { background-color: #0d121e; color: white; border: 2px solid #f87171; }
     .legend {
       display: flex; justify-content: space-between; margin-top: 20px; font-size: 14px;
     }
@@ -125,12 +135,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_reservation'])
     .legend-box { width: 16px; height: 16px; border-radius: 4px; }
     .box-available { background-color: #34d399; }
     .box-used { background-color: #f87171; }
-    .pc-tile.selected {
-      box-shadow: 0 0 0 3px #22d3ee;
+    .pc-tile.selected { box-shadow: 0 0 0 3px #22d3ee; }
+    .pc-tile.clickable:hover { background-color: #1a2333; }
+
+    .notification {
+      display: none;
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: #181a25;
+      color: white;
+      padding: 15px 20px;
+      border-radius: 20px;
+      font-size: 14px;
+      z-index: 1000;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
-    .pc-tile.clickable:hover {
-      background-color: #1a2333;
-    }
+    .notification.show { display: flex; opacity: 1; }
+    .notification.success i { color: #4ade80; }
+    .notification.error i { color: #f87171; }
   </style>
 </head>
 <body>
@@ -175,7 +203,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_reservation'])
       <button type="submit" name="submit_reservation">Reserve</button>
     </form>
 
-    <!-- Select PC Panel -->
     <div class="table-box">
       <h3><i class="fas fa-desktop"></i> Select a PC</h3>
       <?php if (!empty($pcs)): ?>
@@ -201,6 +228,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_reservation'])
   </div>
 </div>
 
+<div id="notification" class="notification <?= $notification_type ?>">
+  <i class="<?= $notification_type === 'success' ? 'fas fa-check-circle' : 'fas fa-times-circle' ?>"></i>
+  <span><?= $notification_message ?></span>
+</div>
+
 <script>
   document.querySelectorAll('input[name="pc_choice"]').forEach(input => {
     input.addEventListener('change', () => {
@@ -210,6 +242,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_reservation'])
       document.getElementById('selected_pc').value = input.value;
     });
   });
+
+  const msg = <?= json_encode($notification_message) ?>;
+  const box = document.getElementById('notification');
+  if (msg) {
+    box.classList.add('show');
+    setTimeout(() => {
+      box.classList.remove('show');
+    }, 3000);
+  }
 </script>
 </body>
 </html>
