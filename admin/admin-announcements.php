@@ -26,17 +26,16 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
         .form-footer { display: flex; justify-content: flex-end; margin-top: 15px; }
         .announcement-form button { padding: 10px 20px; background-color: white; color: #0d121e; border: none; border-radius: 20px; cursor: pointer; font-size: 14px; }
         .announcements-container { max-height: 350px; overflow-y: auto; padding: 20px; border-radius: 10px; }
-        .announcement-item { position: relative; background-color: #212b40; padding: 15px; border-radius: 2px; margin-bottom: 15px; }
+        .announcement-item { position: relative; background-color: #212b40; padding: 15px; border-radius: 5px; margin-bottom: 15px; }
         .announcement-item small { display: block; margin-top: 5px; color: #aaa; font-size: 12px; }
-</style>
-
+    </style>
 </head>
 <body>
     <?php include '../includes/admin-sidebar.php'; ?>
 
     <div class="main-content">
         <header>
-            <h1>Announcements</h1>
+            <h1><i class="fas fa-bullhorn"></i> Announcements</h1>
         </header>
 
         <div class="content-wrapper">
@@ -49,40 +48,41 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
                     </div>
                 </form>
             </div>
+
             <div class="box announcements-container">
                 <div class="box-title">Published Announcements</div>
                 <?php include '../includes/fetch-announcement.php'; ?>
             </div>
         </div>
     </div>
+
     <script>
-function editAnnouncement(id) {
-    document.getElementById("announcement-text-" + id).style.display = "none";
-    document.getElementById("edit-form-" + id).style.display = "block";
-}
+        function editAnnouncement(id) {
+            document.getElementById("announcement-text-" + id).style.display = "none";
+            document.getElementById("edit-form-" + id).style.display = "block";
+        }
 
-function cancelEdit(id) {
-    document.getElementById("announcement-text-" + id).style.display = "block";
-    document.getElementById("edit-form-" + id).style.display = "none";
-}
+        function cancelEdit(id) {
+            document.getElementById("announcement-text-" + id).style.display = "block";
+            document.getElementById("edit-form-" + id).style.display = "none";
+        }
 
-function deleteAnnouncement(id) {
-    if (confirm("Are you sure you want to delete this announcement?")) {
-        let form = document.createElement("form");
-        form.method = "POST";
-        form.action = "../includes/delete-announcement.php";
+        function deleteAnnouncement(id) {
+            if (confirm("Are you sure you want to delete this announcement?")) {
+                let form = document.createElement("form");
+                form.method = "POST";
+                form.action = "../includes/delete-announcement.php";
 
-        let input = document.createElement("input");
-        input.type = "hidden";
-        input.name = "announcement_id";
-        input.value = id;
+                let input = document.createElement("input");
+                input.type = "hidden";
+                input.name = "announcement_id";
+                input.value = id;
 
-        form.appendChild(input);
-        document.body.appendChild(form);
-        form.submit();
-    }
-}
-</script>
-
+                form.appendChild(input);
+                document.body.appendChild(form);
+                form.submit();
+            }
+        }
+    </script>
 </body>
 </html>

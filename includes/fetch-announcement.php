@@ -8,7 +8,7 @@ if (session_status() === PHP_SESSION_NONE) {
 // Handle Delete Request
 if (isset($_POST['delete_id'])) {
     $delete_id = $_POST['delete_id'];
-    $delete_sql = "DELETE FROM announcements WHERE id = ?";
+    $delete_sql = "DELETE FROM announcement WHERE id = ?";
     $stmt = $conn->prepare($delete_sql);
     $stmt->bind_param("i", $delete_id);
     if ($stmt->execute()) {
@@ -21,10 +21,10 @@ if (isset($_POST['delete_id'])) {
 }
 
 // Fetch Announcements
-$sql = "SELECT id, announcement_text, created_by, created_at FROM announcements ORDER BY created_at DESC";
+$sql = "SELECT id, announcement_text, created_by, created_at FROM announcement ORDER BY created_at DESC";
 $result = $conn->query($sql);
 
-if ($result->num_rows > 0) {
+if ($result && $result->num_rows > 0) {
     while ($row = $result->fetch_assoc()) {
         echo "<div class='announcement-item' id='announcement-".$row['id']."'>";
         echo "<button class='delete-btn' onclick='deleteAnnouncement(".$row['id'].")'><i class='fas fa-trash'></i></button>";
@@ -61,7 +61,6 @@ function deleteAnnouncement(id) {
 </script>
 
 <style>
-
 .delete-btn {
     position: absolute;
     top: 10px;

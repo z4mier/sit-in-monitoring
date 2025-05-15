@@ -7,7 +7,7 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
     exit();
 }
 
-// Fetch the total number of registered students (excluding admin)
+// Fetch the total number of registered students 
 $sql_users = "SELECT COUNT(*) as total_users FROM users WHERE role != 'admin' OR role IS NULL";
 $result_users = $conn->query($sql_users);
 $total_users = ($result_users->num_rows > 0) ? $result_users->fetch_assoc()['total_users'] : 0;

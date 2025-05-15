@@ -140,7 +140,7 @@
     <a href="admin-leaderboard.php"><i class="fas fa-trophy"></i><span>Leaderboard</span></a>
   </div>
 
-  <div class="sidebar-logout" style="margin-top: 290px; padding-left: 5px; margin-bottom: auto;">
+  <div class="sidebar-logout" style="margin-top:200px; padding-left: 5px; margin-bottom: auto;">
     <a href="../includes/logout.php"><i class="fas fa-sign-out-alt"></i><span>Logout</span></a>
   </div>
 </div>

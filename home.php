@@ -66,7 +66,7 @@ $conn = new mysqli("localhost", "root", "", "sysarch");
             <div class="announcements">
                 <h3><i class="fas fa-bullhorn"></i> Announcements</h3>
                 <?php
-                $sql = "SELECT announcement_text, created_at, created_by FROM announcements ORDER BY created_at DESC LIMIT 5";
+                $sql = "SELECT announcement_text, created_at, created_by FROM announcement ORDER BY created_at DESC LIMIT 5";
                 $result = $conn->query($sql);
 
                 if ($result && $result->num_rows > 0) {
