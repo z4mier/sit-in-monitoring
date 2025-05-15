@@ -125,7 +125,6 @@
 </head>
 <body>
 
-  <!-- SIDEBAR -->
 <div class="sidebar">
   <div class="sidebar-links">
     <a href="admin-home.php"><i class="fas fa-home"></i><span>Home</span></a>
@@ -141,14 +140,11 @@
   </div>
 
   <div class="sidebar-logout" style="margin-top:200px; padding-left: 5px; margin-bottom: auto;">
-    <a href="../includes/logout.php"><i class="fas fa-sign-out-alt"></i><span>Logout</span></a>
+    <a href="#" onclick="confirmLogout()"><i class="fas fa-sign-out-alt"></i><span>Logout</span></a>
   </div>
 </div>
-
-
   </div>
 
-  <!-- SEARCH MODAL -->
   <div class="search-overlay" id="searchModal">
     <div class="search-box">
       <button class="close-search-modal" onclick="closeModal()">&times;</button>
@@ -160,10 +156,15 @@
     </div>
   </div>
 
-  <!-- SIT-IN FORM CONTAINER -->
   <div id="sitInFormContainer"></div>
 
   <script>
+function confirmLogout() {
+    if (confirm("Are you sure you want to logout?")) {
+      window.location.href = "../includes/logout.php";
+    }
+  }
+
     function openModal() {
       document.getElementById('searchModal').style.display = 'flex';
     }
