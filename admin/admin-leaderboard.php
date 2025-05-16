@@ -6,10 +6,11 @@ $mode = $_GET['mode'] ?? 'all_time';
 $data = [];
 
 $sql = "SELECT s.id_no, u.profile_picture, u.firstname, u.middlename, u.lastname,
-               COUNT(*) AS total_sessions, SUM(points) AS total_points
+               COUNT(*) AS total_sessions, u.points AS total_points
         FROM sit_in_records s
         JOIN users u ON s.id_no = u.id_no
-        GROUP BY s.id_no, u.profile_picture, u.firstname, u.middlename, u.lastname";
+        GROUP BY s.id_no, u.profile_picture, u.firstname, u.middlename, u.lastname, u.points";
+
 
 if ($mode === 'most_active') {
     $sql .= " ORDER BY total_sessions DESC LIMIT 5";
