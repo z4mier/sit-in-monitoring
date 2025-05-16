@@ -172,7 +172,7 @@ $conn->close();
 
 <div class="main-content">
   <header>
-    <h1>Current Sit-In</h1>
+    <h1>Admin - Current Sit-In</h1>
   </header>
 
   <div class="table-container">

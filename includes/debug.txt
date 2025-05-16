@@ -1,0 +1,11 @@
+Array
+(
+    [user] => Array
+        (
+            [firstname] => Hamela
+            [lastname] => Sala
+            [username] => hamela
+            [role] => user
+        )
+
+)

@@ -99,17 +99,26 @@ $year = $row['yr_level'];
 .modal-body input,
 .modal-body select {
     width: 100%;
-    padding: 10px;
-    border-radius: 5px;
-    border: 1px solid #333;
-    background-color: #212b40;
+    padding: 12px 14px;
+    font-size: 14px;
+    line-height: 1.5;
+    height: 48px;
+    border-radius: 6px;
+    background-color: #1f2937;
+    color: white;
+    border: none;
+    box-sizing: border-box;
+    appearance: none;
+}
+input[type="time"]::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+    }
+
+.modal-body select option {
+    background-color: #1f2937;
     color: white;
 }
 
-.modal-body select option {
-    background-color: #212b40;
-    color: white;
-}
 
 .modal-footer {
     display: flex;

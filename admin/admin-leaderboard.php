@@ -39,7 +39,7 @@ $conn->close();
   <style>
     body { margin: 0; font-family: 'Inter', sans-serif; background-color: #0d121e; color: white; display: flex; }
     .main-content { margin-left: 80px; padding: 20px; flex: 1; }
-    .sidebar:hover ~ .main-content { margin-left: 200px; width: calc(100% - 200px); }
+    .sidebar:hover ~ .main-content { margin-left: 200px; }
     .tab-buttons { display: flex; justify-content: center; gap: 16px; margin-bottom: 40px; }
     .tab-buttons a { padding: 10px 24px; border-radius: 9999px; font-weight: 600; text-decoration: none; background-color: #1f2937; color: #fff; }
     .tab-buttons a.active { background-color: #2563eb; color: #fff; box-shadow: 0 0 8px rgba(37, 99, 235, 0.6);}
@@ -54,7 +54,7 @@ $conn->close();
 <?php include '../includes/admin-sidebar.php'; ?>
 <div class="main-content">
   <div class="pb-4 border-b-2 border-white/10 mb-6">
-    <h1 class="text-3xl font-bold text-white">Leaderboard</h1>
+    <h1 class="text-3xl font-bold text-white">Admin - Leaderboard</h1>
   </div>
 
   <div class="leaderboard-box">
@@ -126,7 +126,7 @@ $conn->close();
         <div class="remaining-entry">
           <div class="flex items-center gap-3">
             <div class="w-10 h-10 rounded-full bg-cover bg-center"
-                 style="background-image: url('../<?= !empty($data[$i]['profile_picture']) ? htmlspecialchars($data[$i]['profile_picture']) : 'uploads/default.png' ?>');"></div>
+                 style="background-image: url('../<?= !empty($data[$i]['profile_picture']) ? htmlspecialchars($data[$i]['profile_picture']) : 'assets/icon.png' ?>');"></div>
             <div>
               <p class="font-semibold text-white"><?= htmlspecialchars($data[$i]['name']) ?></p>
               <p class="text-gray-400 text-sm">Rank <?= $i + 1 ?></p>

@@ -24,6 +24,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         if (password_verify($password, $user['password'])) {
             $_SESSION['user'] = [
+                'id_no' => $user['id_no'],
                 'firstname' => $user['firstname'],
                 'lastname' => $user['lastname'],
                 'username' => $user['username'],

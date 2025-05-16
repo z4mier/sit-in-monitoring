@@ -106,7 +106,7 @@ $conn->close();
 <?php include '../includes/admin-sidebar.php'; ?>
 <div class="main-content">
   <div style="display: flex; justify-content: space-between; align-items: center;">
-    <h1>Reservation Logs</h1>
+    <h1>Admin - Reservation Logs</h1>
     <a href="admin-reservations.php" class="back-btn"><i class="fas fa-arrow-left"></i> Back</a>
   </div>
   <hr>

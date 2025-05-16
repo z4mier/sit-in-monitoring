@@ -97,11 +97,8 @@ $conn->close();
 
 <div class="main-content">
 <header>
-  <h1>Students List</h1>
+  <h1>Admin - Student's List</h1>
   <div class="search-container">
-    <button class="add-button" id="openModalBtn" title="Add Student">
-      <i class="fas fa-plus"></i>
-    </button>
     <button class="reset-all-btn" onclick="resetAllSessions()" title="Reset All Sessions">
       <i class="fas fa-sync-alt"></i>
     </button>

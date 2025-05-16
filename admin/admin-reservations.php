@@ -105,7 +105,7 @@ unset($_SESSION['notification_message'], $_SESSION['notification_type']);
 <?php include '../includes/admin-sidebar.php'; ?>
 <div class="main-content">
   <div style="padding-bottom: 20px; border-bottom: 2px solid #333; margin-bottom: 20px;">
-    <h1>Reservation Controls</h1>
+    <h1>Admin - Reservation Controls</h1>
     <a href="admin-reservation-logs.php">
   <button style="margin-top: 10px; padding: 10px 18px; font-size: 15px; border-radius: 8px; background-color: white; color: 212b40; border: none; cursor: pointer;">
     View Reservation Logs

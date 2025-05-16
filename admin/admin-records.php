@@ -173,7 +173,7 @@ $conn->close();
 
 <div class="main-content">
 <header>
-    <h1>Sit-In Records</h1>
+    <h1>Admin - Sit-In Records</h1>
     <form class="search-container" method="GET" action="" id="searchForm">
         <input type="text" name="search" id="searchInput" placeholder="Search" value="<?= htmlspecialchars($search) ?>" 
                oninput="handleSearchInput(this)">

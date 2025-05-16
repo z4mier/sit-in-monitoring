@@ -35,7 +35,7 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
 
     <div class="main-content">
         <header>
-            <h1><i class="fas fa-bullhorn"></i> Announcements</h1>
+            <h1>Admin - Announcements</h1>
         </header>
 
         <div class="content-wrapper">

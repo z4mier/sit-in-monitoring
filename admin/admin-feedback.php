@@ -80,7 +80,7 @@ $conn->close();
 
 <div class="main-content">
   <header>
-    <h1>Feedback Reports</h1>
+    <h1>Admin - Feedback Reports</h1>
   </header>
 
   <div class="table-container">
