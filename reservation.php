@@ -104,9 +104,31 @@ unset($_SESSION['notification_message'], $_SESSION['notification_type']);
       text-align: center; font-size: 20px; margin-bottom: 15px;
     }
     form label { display: block; margin: 10px 0 5px; }
-    form select, form input[type="date"], form input[type="time"] {
-      width: 100%; padding: 10px; border-radius: 20px; border: none; font-size: 14px;
-    }
+    form select,
+form input[type="date"],
+form input[type="time"] {
+  width: 100%;
+  padding: 12px 16px;
+  font-size: 14px;
+  height: 40px;
+  border-radius: 30px;
+  background-color: white;
+  color: black;
+  border: none;
+  box-sizing: border-box;
+  appearance: none;
+  margin-bottom: 10px;
+}
+
+/* Keep date & time icons visible, just style them */
+form input[type="date"]::-webkit-calendar-picker-indicator,
+form input[type="time"]::-webkit-calendar-picker-indicator {
+  margin-right: 10px;
+  cursor: pointer;
+  opacity: 1;
+  filter: none; /* keep default appearance */
+}
+
     form button {
       margin-top: 15px; width: 100%; padding: 12px; background-color: #212b40;
       color: white; border: none; border-radius: 20px; cursor: pointer; font-size: 15px;

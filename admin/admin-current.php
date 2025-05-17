@@ -3,25 +3,75 @@ session_start();
 include '../includes/db-connection.php';
 
 $sit_in_rows = '';
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['name'], $_POST['purpose'], $_POST['lab_number'], $_POST['remaining_sessions'])) {
+    $id_no = $_POST['id_no'];
+    $name = $_POST['name'];
+    $purpose = $_POST['purpose'];
+    $lab_number = $_POST['lab_number'];
+    $remaining_sessions = (int) $_POST['remaining_sessions'];
+    $date = date('Y-m-d');
+    $time_in = date('H:i:s');
+
+    // Prevent duplicate active records
+    $check = $conn->prepare("SELECT * FROM sit_in_records WHERE id_no = ? AND status IN ('Pending', 'Active')");
+    $check->bind_param("s", $id_no);
+    $check->execute();
+    $result = $check->get_result();
+
+    if ($result->num_rows === 0) {
+        $insert = $conn->prepare("INSERT INTO sit_in_records (id_no, name, purpose, lab_number, remaining_sessions, status, time_in, date) VALUES (?, ?, ?, ?, ?, 'Pending', ?, ?)");
+        $insert->bind_param("ssssiss", $id_no, $name, $purpose, $lab_number, $remaining_sessions, $time_in, $date);
+        $insert->execute();
+        $_SESSION['notification_message'] = "Sit-In record submitted successfully!";
+        $_SESSION['notification_type'] = "success";
+    } else {
+        $_SESSION['notification_message'] = "Student already has an active or pending sit-in.";
+        $_SESSION['notification_type'] = "error";
+    }
+
+    header("Location: admin-current.php");
+    exit();
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (isset($_POST['id_no']) && isset($_POST['reward'])) {
-        $id_no = $_POST['id_no'];
+   if (isset($_POST['id_no']) && isset($_POST['reward'])) {
+    $id_no = $_POST['id_no'];
 
-        $reward_stmt = $conn->prepare("UPDATE users SET points = points + 1 WHERE id_no = ?");
-        $reward_stmt->bind_param("s", $id_no);
+    // Get current points and sessions
+    $get = $conn->prepare("SELECT points, remaining_sessions FROM users WHERE id_no = ?");
+    $get->bind_param("s", $id_no);
+    $get->execute();
+    $res = $get->get_result()->fetch_assoc();
 
-        if ($reward_stmt->execute()) {
-            $_SESSION['notification_message'] = "1 point rewarded to ID $id_no!";
-            $_SESSION['notification_type'] = "success";
-        } else {
-            $_SESSION['notification_message'] = "Failed to reward point.";
-            $_SESSION['notification_type'] = "error";
-        }
+    $current_points = (int)$res['points'];
+    $current_sessions = (int)$res['remaining_sessions'];
+    $new_points = $current_points + 1;
 
-        header("Location: admin-current.php");
-        exit();
+    // Calculate how many full sets of 3 points
+    $old_set = floor($current_points / 3);
+    $new_set = floor($new_points / 3);
+
+    // Determine if a new session should be added
+    if ($new_set > $old_set) {
+        $update = $conn->prepare("UPDATE users SET points = ?, remaining_sessions = remaining_sessions + 1 WHERE id_no = ?");
+        $update->bind_param("is", $new_points, $id_no);
+        $update->execute();
+
+        $_SESSION['notification_message'] = "🎉 $new_points points! +1 session added.";
+        $_SESSION['notification_type'] = "success";
+    } else {
+        $reward_stmt = $conn->prepare("UPDATE users SET points = ? WHERE id_no = ?");
+        $reward_stmt->bind_param("is", $new_points, $id_no);
+        $reward_stmt->execute();
+
+        $_SESSION['notification_message'] = "1 point rewarded to ID $id_no! ($new_points total)";
+        $_SESSION['notification_type'] = "success";
     }
+
+    header("Location: admin-current.php");
+    exit();
+}
+
     if (isset($_POST['start_session'])) {
     $sit_in_id = $_POST['sit_in_id'];
     $sql = "UPDATE sit_in_records SET status = 'Active', time_in = NOW() WHERE id = ?";

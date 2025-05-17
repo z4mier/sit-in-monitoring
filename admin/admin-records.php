@@ -10,7 +10,7 @@ unset($_SESSION['notification_message'], $_SESSION['notification_type']);
 $sort_column = $_GET['sort'] ?? 'id';
 $sort_order = $_GET['order'] ?? 'DESC';
 
-$allowed_columns = ['id', 'id_no', 'name', 'purpose', 'lab_number', 'time_in', 'time_out', 'date', 'points'];
+$allowed_columns = ['id', 'id_no', 'name', 'purpose', 'lab_number', 'time_in', 'time_out', 'date'];
 $allowed_orders = ['ASC', 'DESC'];
 
 if (!in_array($sort_column, $allowed_columns)) $sort_column = 'time_in';
@@ -37,9 +37,8 @@ if (!empty($search)) {
 
 $where_clause = count($filters) ? "WHERE " . implode(" AND ", $filters) : "";
 
-$sql = "SELECT r.id, r.id_no, r.name, r.purpose, r.lab_number, r.time_in, r.time_out, r.date, r.points, u.remaining_sessions
+$sql = "SELECT r.id, r.id_no, r.name, r.purpose, r.lab_number, r.time_in, r.time_out, r.date
         FROM sit_in_records r
-        JOIN users u ON r.id_no = u.id_no
         $where_clause
         ORDER BY $sort_column $sort_order";
 
@@ -47,7 +46,6 @@ $result = $conn->query($sql);
 
 if ($result && $result->num_rows > 0) {
     while ($row = $result->fetch_assoc()) {
-        $id = htmlspecialchars($row['id']);
         $id_no = htmlspecialchars($row['id_no']);
         $name = htmlspecialchars($row['name']);
         $purpose = htmlspecialchars($row['purpose']);
@@ -55,11 +53,6 @@ if ($result && $result->num_rows > 0) {
         $time_in = $row['time_in'] ? date('H:i:s', strtotime($row['time_in'])) : '—';
         $time_out = $row['time_out'] ? date('H:i:s', strtotime($row['time_out'])) : '—';
         $date = htmlspecialchars($row['date']);
-        $points = (int)($row['points'] ?? 0);
-        $remaining_sessions = (int)$row['remaining_sessions'];
-
-        $disabled = $remaining_sessions >= 30 ? "disabled" : "";
-        $messageText = $remaining_sessions >= 30 ? "<span style='color: #f87171; font-size: 13px;'>Student has reached the maximum sessions</span>" : "";
 
         $sit_in_rows .= "
         <tr>
@@ -70,31 +63,10 @@ if ($result && $result->num_rows > 0) {
             <td>$time_in</td>
             <td>$time_out</td>
             <td>$date</td>
-            <td>
-                <div style='display: flex; flex-direction: column; align-items: center; gap: 6px;'>
-                    <span style='font-size: 14px;'>Given: <strong>$points</strong></span>
-                    <form method='POST' action='../includes/assign-points.php' style='display: flex; justify-content: center; align-items: center; gap: 6px;'>
-                        <input type='hidden' name='sit_in_id' value='$id'>
-                        <input 
-                            type='number' 
-                            name='points' 
-                            min='0' 
-                            max='1' 
-                            oninput='this.value = Math.max(0, Math.min(1, this.value));'
-                            style='width: 50px; padding: 6px; text-align: center; font-size: 14px;' 
-                            $disabled
-                        />
-                        <button type='submit' style='border: none; background-color: white; color: #111524; border-radius: 5px; padding: 6px 10px; cursor: pointer;' title='Add Point' $disabled>
-                            <i class='fas fa-plus'></i>
-                        </button>
-                    </form>
-                </div>
-            </td>
-            <td>$messageText</td>
         </tr>";
     }
 } else {
-    $sit_in_rows = "<tr><td colspan='10'>No sit-in records found.</td></tr>";
+    $sit_in_rows = "<tr><td colspan='7'>No sit-in records found.</td></tr>";
 }
 
 $conn->close();
@@ -135,7 +107,6 @@ $conn->close();
 </script>
 <?php endif; ?>
 
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -158,8 +129,6 @@ $conn->close();
         .search-container { display: flex; align-items: center; margin-bottom: 20px; position: relative; }
         .search-container input { padding: 10px 10px 10px 30px; border: none; border-radius: 20px; width: 200px; background-color: white; color: black; }
         .search-container .search-icon { position: absolute; left: 10px; color: black; }
-        .sort-arrow { margin-left: 5px; transition: transform 0.3s; }
-        .sort-arrow.asc { transform: rotate(180deg); }
         td:nth-child(1) { text-align: left; padding-left: 70px; }
         .pagination-wrapper { display: flex; justify-content: flex-end; align-items: center; gap: 15px; padding: 15px 20px 0 0; color: white; font-size: 14px; }
         .pagination-wrapper select { background-color: #212b40; color: white; border: 1px solid #555; border-radius: 4px; padding: 5px 8px; }
@@ -180,9 +149,10 @@ $conn->close();
         <i class="fas fa-search search-icon"></i>
     </form>
 </header>
-    <div class="table-container">
-        <table>
-            <thead>
+
+<div class="table-container">
+    <table>
+        <thead>
             <tr>
                 <th>ID Number</th>
                 <th>Name</th>
@@ -191,34 +161,32 @@ $conn->close();
                 <th>Time In</th>
                 <th>Time Out</th>
                 <th>Date</th>
-                <th>Points</th>
-                <th>Session Status</th>
             </tr>
-            </thead>
-            <tbody id="sitInTable">
-                <?= $sit_in_rows ?>
-            </tbody>
-        </table>
+        </thead>
+        <tbody id="sitInTable">
+            <?= $sit_in_rows ?>
+        </tbody>
+    </table>
 
-        <div class="pagination-wrapper">
-            <div class="rows-selector">
-                Rows per page:
-                <select id="rowsPerPage" onchange="updatePagination()">
-                    <option value="5">5</option>
-                    <option value="10" selected>10</option>
-                    <option value="20">20</option>
-                    <option value="50">50</option>
-                </select>
-            </div>
-            <div id="pageInfo"></div>
-            <div class="nav-buttons">
-                <button onclick="goToFirstPage()">«</button>
-                <button onclick="goToPreviousPage()">‹</button>
-                <button onclick="goToNextPage()">›</button>
-                <button onclick="goToLastPage()">»</button>
-            </div>
+    <div class="pagination-wrapper">
+        <div class="rows-selector">
+            Rows per page:
+            <select id="rowsPerPage" onchange="updatePagination()">
+                <option value="5">5</option>
+                <option value="10" selected>10</option>
+                <option value="20">20</option>
+                <option value="50">50</option>
+            </select>
+        </div>
+        <div id="pageInfo"></div>
+        <div class="nav-buttons">
+            <button onclick="goToFirstPage()">«</button>
+            <button onclick="goToPreviousPage()">‹</button>
+            <button onclick="goToNextPage()">›</button>
+            <button onclick="goToLastPage()">»</button>
         </div>
     </div>
+</div>
 </div>
 
 <script>
@@ -274,5 +242,6 @@ function goToLastPage() {
 
 window.onload = displayPage;
 </script>
+
 </body>
 </html>
